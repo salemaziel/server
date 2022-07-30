@@ -1,0 +1,25 @@
+
+## SSH Tunneling
+
+# Use ssh key to connect Local port 8090 to the host 192.168.1.147's port 8090
+# Basically: service running on 192.168.1.147:8090, with this command forwards host 192.168.1.147 port 8090 to MY localhost port 8090
+# This lets me connect to my localhost port 8090 (i.e. visiting in browser) and will be connected to 192.168.1.147 port 8090 over SSH tunnel
+ssh -i .ssh/github -L 8090:192.168.1.147:8090 root@192.168.1.147
+
+
+
+
+
+
+
+
+## Rsync SSH
+
+# rsync using archive, partial, over ssh using sshkey to ssh server running on port 4444, syncing local directory to user's home folder on remote host
+# Be careful of spaces, weird characters etc, use quotations like below
+rsync -a -h --info=progress2 -P -e "ssh -i ~/.ssh/sshkey -p 4444" "/path/to/'local directory'" user@remotehost:~/
+
+# Similar but without using archive
+rsync -rptvPzh --info=progress2 -e "ssh -i ~/.ssh/github" "./DTT-540p"  "stash@192.168.1.242:/home/stash/srv/stashapp/files/data/v"
+
+

@@ -1,0 +1,39 @@
+######################
+## Linux fde install - encrypt disk to install an OS on it
+DISK=''
+DISK_PARTITION=''
+
+ROOT_SIZE=''
+#ROOT_SIZE='25G'
+#ROOT_SIZE='+42%'
+
+HOME_SIZE=''
+#HOME_SIZE='45%'
+
+SWAP_SIZE=''
+#SWAP_SIZE='3%'
+
+TMP_SIZE=''
+#TMP_SIZE='10%'
+
+# LVM 
+
+# Physical Volume
+PV_MAPPER=''
+
+# Volume group name
+VG_NAME=''
+#VG_NAME='vg0'
+
+# Logical volume names
+LV_ROOT=''
+#LV_ROOT='lv-root'
+
+LV_HOME=''
+#LV_HOME='lv-home'
+
+LV_SWAP=''
+#LV_SWAP='lv-swap'
+
+LV_TMP=''
+#LV_TMP='lv-tmp'
