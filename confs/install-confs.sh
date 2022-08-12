@@ -148,6 +148,54 @@ function install-grub-d() {
     update-grub
 }
 
+## install dotfiles
+function install-dotfiles() {
+    echo_info "Installing dotfiles"
+    echo_prompt "Do you want to install dotfiles? [ y / n ]"
+    read "dotfiles_install"
+    if [ "$dotfiles_install" == "n" ] || [ "$dotfiles_install" == "N" ]; then
+      echo_warn "Skipping dotfiles install"
+    elif [ "$dotfiles_install" == "y" ] || [ "$dotfiles_install" == "Y" ]; then
+        echo_prompt "Do you want to install dotfiles for root? [ y / n ]"
+        read "dotfiles_root_install"
+        
+        if [ "${dotfiles_root_install}" == "y" ] || [ "${dotfiles_root_install}" == "Y" ]; then
+          echo_info "Installing dotfiles"
+          mv "$HOME/.bashrc" "$HOME/.bashrc.original"
+          mv "$HOME/.profile" "$HOME/.profile.original"
+          cp -f "${SCRIPT_DIR}/confs/dotfiles/.bash_aliases" "$HOME/.bash_aliases"
+          cp -f "${SCRIPT_DIR}/confs/dotfiles/.bashrc" "$HOME/.bashrc"
+          cp -f "${SCRIPT_DIR}/confs/dotfiles/.profile" "$HOME/.profile"
+        
+        elif [ "${dotfiles_root_install}" == "n" ] || [ "${dotfiles_root_install}" == "N" ]; then
+          echo_info "Skipping dotfiles install for root"
+        else
+          echo_warn "Invalid option. Skipping dotfiles install for root"
+        fi
+
+        echo_prompt "Do you want to install dotfiles for non-root? [ y / n ]"
+        read "dotfiles_nonroot_install"
+        if [ "${dotfiles_nonroot_install}" == "y" ] || [ "${dotfiles_nonroot_install}" == "Y" ]; then
+            echo_prompt "Enter the username of the user you want to install dotfiles for: "
+            read "dotfiles_user"
+
+            echo_info "Installing dotfiles for ${dotfiles_user}"
+            mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
+            mv /home/"${dotfiles_user}"/.profile /home/"${dotfiles_user}"/.profile.original
+            cp -f "${SCRIPT_DIR}/confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
+            cp -f "${SCRIPT_DIR}/confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
+            cp -f "${SCRIPT_DIR}/confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
+
+        elif [ "${dotfiles_nonroot_install}" == "n" ] || [ "${dotfiles_nonroot_install}" == "N" ]; then
+            echo_info "Skipping dotfiles install for non-root"
+        else
+            echo_warn "Invalid option. Skipping dotfiles install for non-root"
+        fi
+    else
+        echo_warn "Invalid option. Skipping dotfiles install"
+    fi
+
+}
 
 
 
@@ -180,3 +228,6 @@ install-resolved-conf
 
 ## install grub.d kernel options file
 install-grub-d
+
+## install dotfiles
+install-dotfiles
