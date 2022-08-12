@@ -100,9 +100,9 @@ function dist-check() {
 
 ## install sysctl.d config file
 function install-sysctl-d() {
-    cp -f "${SCRIPT_DIR}/confs/sysctl.d/*" /etc/sysctl.d/
+    cp -r -f "${SCRIPT_DIR}/confs/sysctl.d" /etc/sysctl.d
     echo_info "Installing sysctl.d config file"
-    sysctl -p /etc/sysctl.d/*.conf
+    sysctl -p
 }
 
 
@@ -143,7 +143,7 @@ function install-resolved-conf() {
 
 ## install grub.d kernel options file
 function install-grub-d() {
-    cp -f "${SCRIPT_DIR}/confs/grub.d/*" /etc/default/grub.d/
+    cp -r -f "${SCRIPT_DIR}/confs/grub.d" /etc/default/grub.d
     echo_info "updating grub"
     update-grub
 }
