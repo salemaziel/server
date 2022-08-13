@@ -1,0 +1,29 @@
+## https://stackoverflow.com/questions/192292/how-best-to-include-other-scripts
+
+
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+. "$DIR/incl.sh"
+. "$DIR/main.sh"
+
+. (dot) command is an alias to source, $PWD is the Path for the Working Directory, BASH_SOURCE is an array variable whose members are the source filenames, ${string%substring} strips shortest match of $substring from back of $string
+
+________________
+
+
+I think the best way to do this is to use the Chris Boran's way, BUT you should compute MY_DIR this way:
+
+#!/bin/sh
+MY_DIR=$(dirname $(readlink -f $0))
+$MY_DIR/other_script.sh
+
+To quote the man pages for readlink:
+
+    readlink - display value of a symbolic link
+
+    ...
+
+      -f, --canonicalize
+            canonicalize  by following every symlink in every component of the given 
+            name recursively; all but the last component must exist
+
