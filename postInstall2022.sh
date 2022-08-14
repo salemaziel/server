@@ -2,21 +2,48 @@
 
 set -eu -o pipefail
 
+# Set base directory
+MY_DIR=$(dirname $(readlink -f $0))
 
-ANSI_RED=$'\033[1;31m'
-ANSI_YEL=$'\033[1;33m'
-ANSI_GRN=$'\033[1;32m'
-ANSI_VIO=$'\033[1;35m'
-ANSI_BLU=$'\033[1;36m'
-ANSI_WHT=$'\033[1;37m'
-ANSI_RST=$'\033[0m'
+# Add text styling
+source "$MY_DIR"/common/text-styling.sh
 
-echo_cmd()    { printf "${ANSI_BLU}${@}${ANSI_RST}"; }
-echo_prompt() { printf "${ANSI_YEL}${@}${ANSI_RST}"; }
-echo_note()   { printf "${ANSI_GRN}${@}${ANSI_RST}"; }
-echo_info()   { printf "${ANSI_WHT}${@}${ANSI_RST}"; }
-echo_warn()   { printf "${ANSI_YEL}${@}${ANSI_RST}"; }
-echo_debug()  { printf "${ANSI_VIO}${@}${ANSI_RST}"; }
-echo_fail()   { printf "${ANSI_RED}${@}${ANSI_RST}"; }
+# Add functions
+source "$MY_DIR"/common/functions.sh
 
-echo_cmd "is this working? \n"
+
+
+# Make executable, install configs
+chmod +x "$MY_DIR"/confs/install-confs.sh
+"$MY_DIR"/confs/install-confs.sh
+
+
+
+
+
+# Choice to Install Docker and Docker-Compose
+echo -e "${COL_MAGENTA}Install Docker? ${COL_RESET}"
+read docker_choice
+
+if [ "$docker_choice" == "y" ] || [ "$docker_choice" == "Y" ]; then
+    chmod +x "$MY_DIR"/dev_installs/install-docker-and-docker-compose.sh
+    "$MY_DIR"/dev_installs/install-docker-and-docker-compose.sh
+elif [ "$docker_choice" == "n" ] || [ "$docker_choice" == "N" ]; then
+    echo -e "${COL_WHITE}Skipping Docker install${COL_RESET}"
+else
+    echo "Invalid choice"
+    exit 1
+fi
+
+
+# Choice to add new user with sudo privs
+echo -e "${COL_MAGENTA}Add new user with sudo privs? ${COL_RESET}"
+read new_user_choice
+if [ "$new_user_choice" == "y" ] || [ "$new_user_choice" == "Y" ]; then
+    add_usersudo
+elif [ "$new_user_choice" == "n" ] || [ "$new_user_choice" == "N" ]; then
+    echo -e "${COL_WHITE}Skipping new user add${COL_RESET}"
+else
+    echo "Invalid choice"
+    exit 1
+fi

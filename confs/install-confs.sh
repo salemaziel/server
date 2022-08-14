@@ -5,7 +5,7 @@ set -eu -o pipefail
 ## Goal: Script which automatically sets up a new Ubuntu Machine after installation
 ## This is a basic install, easily configurable to your needs
 
-SCRIPT_DIR="/home/pc/Server"
+SCRIPT_DIR=$(dirname $(readlink -f $0))
 
 
 ## Add some color
