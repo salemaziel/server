@@ -28,7 +28,7 @@ MY_DIR="$(realpath .)"
 
 
 # Add text styling
-#source "$MY_DIR"/common/text-styling.sh
+source "$MY_DIR"/common/text-styling.sh
 
 # Add functions
 source "$MY_DIR"/common/functions.sh
