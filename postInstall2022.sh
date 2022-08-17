@@ -2,13 +2,33 @@
 
 set -eu -o pipefail
 
+## Add some color
+
+ANSI_RED=$'\033[1;31m'
+ANSI_YEL=$'\033[1;33m'
+ANSI_GRN=$'\033[1;32m'
+ANSI_VIO=$'\033[1;35m'
+ANSI_BLU=$'\033[1;36m'
+ANSI_WHT=$'\033[1;37m'
+ANSI_RST=$'\033[0m'
+
+echo_cmd()    { echo -e "${ANSI_BLU}${@}${ANSI_RST}"; }
+echo_prompt() { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+echo_note()   { echo -e "${ANSI_GRN}${@}${ANSI_RST}"; }
+echo_info()   { echo -e "${ANSI_WHT}${@}${ANSI_RST}"; }
+echo_warn()   { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+echo_debug()  { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
+echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
+
+
+
 # Set base directory
 #MY_DIR=$(dirname $(readlink -f $0))
 MY_DIR="$(realpath .)"
 
 
 # Add text styling
-source "$MY_DIR"/common/text-styling.sh
+#source "$MY_DIR"/common/text-styling.sh
 
 # Add functions
 source "$MY_DIR"/common/functions.sh
