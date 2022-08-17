@@ -6,7 +6,7 @@ set -eu -o pipefail
 ## This is a basic install, easily configurable to your needs
 
 SCRIPT_DIR=$(dirname $(readlink -f $0))
-
+#SCRIPT_DIR="$PWD"
 
 ## Add some color
 
@@ -100,7 +100,7 @@ function dist-check() {
 
 ## install sysctl.d config file
 function install-sysctl-d() {
-    cp -r -f "${SCRIPT_DIR}/confs/sysctl.d" /etc/sysctl.d
+    cp -r -f "./confs/sysctl.d" /etc/sysctl.d
     echo_info "Installing sysctl.d config file"
     sysctl -p
 }
@@ -114,7 +114,7 @@ function install-sshd-conf() {
 
     if [ "${sshd_config_install}" == "y" ] || [ "${sshd_config_install}" == "Y" ]; then
         mv /etc/ssh/sshd_config /etc/ssh/sshd_config.original
-        cp -f "${SCRIPT_DIR}/confs/ssh/sshd_config.hardened" /etc/ssh/sshd_config
+        cp -f "./confs/ssh/sshd_config.hardened" /etc/ssh/sshd_config
         echo_info "Installing sshd config file"
         sudo kill -SIGHUP "$(pgrep -f 'sshd -D')"
         sudo systemctl daemon-reload && sleep 2 && sudo systemctl restart sshd
@@ -129,21 +129,45 @@ function install-sshd-conf() {
 
 ## install resolved.conf.d config file; get rid of default DNS stub
 function install-resolved-conf() {
-    cp -r -f "${SCRIPT_DIR}/confs/systemd/resolved.conf.d" /etc/systemd/resolved.conf.d
+  if [ "${DISTRO}" == "ubuntu" ] ; then
+    cp -r -f "./confs/systemd/resolved.conf.d" /etc/systemd/resolved.conf.d
 
     echo_info "Installing resolved.conf.d config file"
     systemctl daemon-reload && sleep 2 && systemctl restart systemd-resolved
     rm /etc/resolv.conf && ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-    systemctl daemon-reload && sleep 2 && systemctl restart systemd-resolved && sleep 2 && systemctl restart networking && sleep 2
+    systemctl daemon-reload && sleep 2 && systemctl restart systemd-resolved && sleep 2
 
     curl https://ifconfig.me/all
+
+  elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
+    echo_info "Not installing resolved.conf.d config file, as i think its only an ubuntu thing"
+    sleep 2
+    echo_note "Continuing. You can install it manually if you want"
+    sleep 1
+  else
+    echo_warn "Not installing resolved.conf.d config file, this doesnt seem to be a supported distro"
+    sleep 2
+    echo_prompt "Want to exit and check it out? [ y / n ] "
+    read check_exit
+    case $check_exit in
+        Y|y)
+            echo_warn "Ok. Quitting"
+            sleep 2
+            exit 1
+                ;;
+        N|n)
+            echo_note "Ok. Continuing... Good luck"
+            sleep 2
+                ;;
+    esac
+  fi
 }
 
 
 ## install grub.d kernel options file
 function install-grub-d() {
-    cp -r -f "${SCRIPT_DIR}/confs/grub.d" /etc/default/grub.d
+    cp -r -f "./confs/grub.d" /etc/default/grub.d
     echo_info "updating grub"
     update-grub
 }
@@ -163,9 +187,9 @@ function install-dotfiles() {
           echo_info "Installing dotfiles"
           mv "$HOME/.bashrc" "$HOME/.bashrc.original"
           mv "$HOME/.profile" "$HOME/.profile.original"
-          cp -f "${SCRIPT_DIR}/confs/dotfiles/.bash_aliases" "$HOME/.bash_aliases"
-          cp -f "${SCRIPT_DIR}/confs/dotfiles/.bashrc" "$HOME/.bashrc"
-          cp -f "${SCRIPT_DIR}/confs/dotfiles/.profile" "$HOME/.profile"
+          cp -f "./confs/dotfiles/.bash_aliases" "$HOME/.bash_aliases"
+          cp -f "./confs/dotfiles/.bashrc" "$HOME/.bashrc"
+          cp -f "./confs/dotfiles/.profile" "$HOME/.profile"
         
         elif [ "${dotfiles_root_install}" == "n" ] || [ "${dotfiles_root_install}" == "N" ]; then
           echo_info "Skipping dotfiles install for root"
@@ -182,9 +206,9 @@ function install-dotfiles() {
             echo_info "Installing dotfiles for ${dotfiles_user}"
             mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
             mv /home/"${dotfiles_user}"/.profile /home/"${dotfiles_user}"/.profile.original
-            cp -f "${SCRIPT_DIR}/confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
-            cp -f "${SCRIPT_DIR}/confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
-            cp -f "${SCRIPT_DIR}/confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
+            cp -f "./confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
+            cp -f "./confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
+            cp -f "./confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
 
         elif [ "${dotfiles_nonroot_install}" == "n" ] || [ "${dotfiles_nonroot_install}" == "N" ]; then
             echo_info "Skipping dotfiles install for non-root"
