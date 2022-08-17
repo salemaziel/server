@@ -383,20 +383,6 @@ unattended_sec() {
     esac
 }
 
-add_usersudo() {
-    echo_note " *** Creating new user with sudo privileges *** "
-    useradd -m -s /bin/bash -U $new_user
-    usermod -aG sudo,adm,systemd-journal,netdev,lp $new_user
-    sudo echo -e "$new_passwd\n$new_passwd" | passwd $new_user > /dev/null 2>&1
-    if [[ -a $HOME/.ssh/authorized_keys ]]; then
-        echo_note "Copying SSH authorized_keys file to new user"
-        sleep 2
-        cp -r $HOME/.ssh /home/$new_user/.ssh
-        chown -R $new_user:$new_user /home/$new_user/.ssh
-    fi
-    echo_note "New user $new_user successfully created with password of $new_passwd"
-    sleep 2
-}
 
 
 install_phpcomposer() {
