@@ -1,7 +1,6 @@
 #!/bin/bash
 
-source ./text-styling.sh
-
+set -eu -o pipefail
 
 
 ## create regular use with sudo privileges
