@@ -21,8 +21,8 @@ case $create_user in
                 y)
                     echo_note "Ok, lets update that password"
                     echo_info "Must be 8+ characters with mix of letters, digits, & symbols"
-                    read -rp  ${COL_YELLOW}"Enter password for new user: "{$COL_RESET} "${TEXT_HIDDEN}new_passwd2${TEXT_HIDDEN_RESET}"
-#                    read new_passwd2
+                    echo_prompt "Enter password for new user: "
+                    read -s new_passwd2
                     sudo echo -e "$new_passwd2\n$new_passwd2" | passwd $new_user > /dev/null 2>&1
                     echo_note "Password for $new_user successfully changed"
                         ;;
@@ -33,8 +33,8 @@ case $create_user in
             esac
         else
             echo_info "Must be 8+ characters with mix of letters, digits, & symbols"
-            read -rp  ${COL_YELLOW}"Enter password for new user: "{$COL_RESET} "${TEXT_HIDDEN}new_passwd${TEXT_HIDDEN_RESET}"
-#            read new_passwd
+            echo_prompt "Enter password for new user: "
+            read -s new_passwd
             add_usersudo
             sleep 2
         fi
