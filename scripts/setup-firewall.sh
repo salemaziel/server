@@ -17,6 +17,7 @@ function ipxtables() {
 
 
 create_fwchain() { 
+echo -e "Creating Firewall chain: VDFIREWALL"
 ipxtables -t filter -N VDFIREWALL || true
 ipxtables -t filter -F VDFIREWALL # empty any existing rules
 }
@@ -43,18 +44,87 @@ ipxtables -t filter -F VDFIREWALL # empty any existing rules
 
 allow_related_established() {
 # allow related and establisted connections
-ipxtables -t filter -A VDFIREWALL -m state --state RELATED,ESTABLISHED -j ACCEPT
-ipxtables -t filter -A VDFIREWALL -p tcp -m tcp -m multiport --dports 22,80,443 -j ACCEPT # 202 is the alternate ssh port
+read -p "Allow related and established connections for webserver (22,80,443) or ssh(22) only? (w/s) " allow_related_established_choice
+
+if [ "$allow_related_established_choice" == "w" ]; then
+    echo -e "Allowing related and established connections for webserver"
+        ipxtables -t filter -A VDFIREWALL -m state --state RELATED,ESTABLISHED -j ACCEPT
+        ipxtables -t filter -A VDFIREWALL -p tcp -m tcp -m multiport --dports 22,80,443 -j ACCEPT 
+elif [ "$allow_related_established_choice" == "s" ]; then
+    echo -e "Allowing related and established connections for ssh only"
+        ipxtables -t filter -A VDFIREWALL -m state --state RELATED,ESTABLISHED -j ACCEPT
+        ipxtables -t filter -A VDFIREWALL -p tcp -m tcp -m multiport --dports 22 -j ACCEPT 
+else
+    allow_related_established_choice
+fi
+
+
 }
 
 
+whitelist_ports_selection() {
+    until [[ "${confirm_ports}" == "y" || "${confirm_ports}" == "Y" ]]; do
+        read -p "Enter space separated list of ports: " ports
+        read -a whitelist_ports <<< $ports
+        echo -e Whitelisting the following ports: "${whitelist_ports[@]}"
+        read -p "Is this correct? [y/n] " confirm_ports
+    done
+
+}
 # whitelist any user ports. we used to use --dports but it has a 15 port limit (XT_MULTI_PORTS)
 #ports_json="/home/yellowtent/platformdata/firewall/ports.json"
+#if allowed_tcp_ports=$(node -e "console.log(JSON.parse(fs.readFileSync('${ports_json}', 'utf8')).allowed_tcp_ports.join(' '))" 2>/dev/null); then
+allowed_tcp_ports(){
+    read -p "White list any TCP ports? [y/n] " whitelist_tcp
+    if [ "$whitelist_tcp" == "y" ] || [ "$whitelist_tcp" == "Y" ]; then
+        read -p "Enter space separated list of ports: " ports
+        read -a tcp_ports <<< $ports
+        echo -e Whitelisting the following ports: "${tcp_ports[@]}"
+#        whitelist_ports_selection
+
+        read -p "Is this correct? [y/n] " confirm_ports
+        if [ "$confirm_ports" == "y" ] || [ "$confirm_ports" == "Y" ]; then
+            for ports in "${tcp_ports[@]}" ; do
+                ipxtables -t filter -A VDFIREWALL -p tcp -m tcp --dport "${ports}" -j ACCEPT
+            done
+        else
+            echo "Please re-run the script"
+            sleep 1
+            echo "actually do it manually, i'm not going to do it for you"
+            sleep 1
+        fi
+    fi
+#    read -p "Enter comma separated list of allowed tcp ports: " allowed_tcp_ports
 #if allowed_tcp_ports=$(node -e "console.log(JSON.parse(fs.readFileSync('${ports_json}', 'utf8')).allowed_tcp_ports.join(' '))" 2>/dev/null); then
 #    for p in $allowed_tcp_ports; do
 #        ipxtables -A VDFIREWALL -p tcp -m tcp --dport "${p}" -j ACCEPT
 #    done
 #fi
+}
+
+allowed_udp_ports(){
+    read -p "White list any UDP ports? [y/n] " whitelist_udp
+    if [ "$whitelist_udp" == "y" ] || [ "$whitelist_udp" == "Y" ]; then
+        read -p "Enter space separated list of ports: " ports
+        read -a udp_ports <<< $ports
+        echo -e Whitelisting the following ports: "${udp_ports[@]}"
+#        whitelist_ports_selection
+
+        read -p "Is this correct? [y/n] " confirm_ports
+        if [ "$confirm_ports" == "y" ] || [ "$confirm_ports" == "Y" ]; then
+            for ports in "${udp_ports[@]}" ; do
+                ipxtables -A VDFIREWALL -p udp -m udp --dport "${ports}" -j ACCEPT
+            done
+        else
+            echo "Please re-run the script"
+            sleep 1
+            echo "actually do it manually, i'm not going to do it for you"
+            sleep 1
+        fi
+    fi
+
+}
+
 
 #if allowed_udp_ports=$(node -e "console.log(JSON.parse(fs.readFileSync('${ports_json}', 'utf8')).allowed_udp_ports.join(' '))" 2>/dev/null); then
 #    for p in $allowed_udp_ports; do
@@ -160,8 +230,8 @@ allow_ssh() {
 #    ipxtables -A VDFIREWALL_RATELIMIT -p tcp --dport ${port} -m state --state NEW -m recent --set --name "public-${port}"
 #    ipxtables -A VDFIREWALL_RATELIMIT -p tcp --dport ${port} -m state --state NEW -m recent --update --name "public-${port}" --seconds 10 --hitcount 5 -j VDFIREWALL_RATELIMIT_LOG
 #done
-ipxtables -A VDFIREWALL_RATELIMIT -p tcp --dport ${port} -m state --state NEW -m recent --set --name "public-22"
-ipxtables -A VDFIREWALL_RATELIMIT -p tcp --dport ${port} -m state --state NEW -m recent --update --name "public-22" --seconds 10 --hitcount 5 -j VDFIREWALL_RATELIMIT_LOG
+ipxtables -A VDFIREWALL_RATELIMIT -p tcp --dport 22 -m state --state NEW -m recent --set --name "public-22"
+ipxtables -A VDFIREWALL_RATELIMIT -p tcp --dport 22 -m state --state NEW -m recent --update --name "public-22" --seconds 10 --hitcount 5 -j VDFIREWALL_RATELIMIT_LOG
 }
 
 
@@ -210,27 +280,129 @@ ipxtables -I FORWARD 1 -j VDFIREWALL_RATELIMIT
 
 
 
+## Dialog multiple choice menu for selecting apps to install
+cmd=(dialog --separate-output --checklist "Default is to Install None. Navigate with Up/Down Arrows. \n 
+Select/Unselect with Spacebar. Hit Enter key When Finished To Continue. \n
+ESC key/Cancel will continue without installing any options \n
+Use Ctrl+c to quit" 22 126 16)
+options=(1 "Allow ICMP" on
+         2 "Allow Docker DNS to localhost" off
+         3 "Allow SSH" on
+         4 "Allow Webserver" on
+         5 "Whitelist Custom TCP Ports" off
+         6 "Whitelist Custom UDP Ports" off
+         7 "Allow Stun/TURN" off
+         8 "Fix for docker adding itself first in FORWARD table" off
+#         8 "Translate docker dnat ports in PREROUTING step" off
+#         9 "" off
+        )
+choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 
 
 
 # Create FW Chain
 create_fwchain
 
-
 # Allow related and established connections
 allow_related_established
 
 
+for FWRULES in $choices
+do
+    case $FWRULES in
+        1)
+#            ICMP=1
+            allow_icmp
+            ;;
+        2)
+#            allow_dns_docker_localhost
+            DNSDOCKER=1
+            ;;
+        3)
+#            allow_ssh
+            SSH=1
+            ;;
+        4)
+#            allow_webserver
+            WEBSERVER=1
+            ;;
+        5)
+#            allowed_tcp_ports
+            CUSTOMTCP=1
+            ;;
+        6)
+#            allowed_udp_ports
+            CUSTOMUDP=1
+            ;;
+        7) 
+#            allow_stun_turn
+            STUN=1
+            ;;
+        8) 
+#            docker_workaround
+            DOCKERWORKAROUND=1
+            ;;
+    esac
+done
+
+if [ $STUN -eq 1 ]; then
+    allow_stun_turn
+fi
+
+if [ $ICMP -eq 1 ]; then
+    allow_icmp
+fi
+if [ $DNSDOCKER -eq 1 ]; then
+    allow_dns_docker_localhost
+fi
+
+log_dropped_in
+
+prepend_chain
+
+rate_limit
+
+log_dropped_incoming
+
+if [ $WEBSERVER -eq 1 ]; then
+    allow_webserver
+fi
+
+if [ $SSH -eq 1 ]; then
+    allow_ssh
+fi
+
+if [ $CUSTOMTCP -eq 1 ]; then
+    allowed_tcp_ports
+fi
+
+if [ $CUSTOMUDP -eq 1 ]; then
+    allowed_udp_ports
+fi
+if [ $DOCKERWORKAROUND -eq 1 ]; then
+    docker_workaround
+fi
+
+
+# add rate limit chain to input chain
+ratelimit_input
+
+
+# Workaround for docker adding itself first in FORWARD table
+docker_workaround
+
+exit 0
+
 # Ask allow turn and stun ports: 3478, 5349, 50000:51000 on tcp and udp
-read -p "Allow Turn and Stun ports?  " "turnstunports"
-case $turnstunports in
-    y)
-    turn_stun
-    ;;
-    n)
-    sleep 0.5
-    ;;
-esac
+#read -p "Allow Turn and Stun ports?  " "turnstunports"
+#case $turnstunports in
+#    y)
+#    turn_stun
+#    ;;
+#    n)
+#    sleep 0.5
+#    ;;
+#esac
 
 
 # Allow ICMP & ICMPv6
@@ -260,16 +432,16 @@ allow_ssh
 
 
 # Ask allow translate 
-read -p "Translate docker ports for 2525, 4190, 9993 (mail, sieve,ldap?)  " "translatedocker"
-case $translatedocker in
-    y)
-    translate_docker
-    ldap_mail
-    ;;
-    n)
-    sleep 0.5
-    ;;
-esac
+#read -p "Translate docker ports for 2525, 4190, 9993 (mail, sieve,ldap?)  #" "translatedocker"
+#case $translatedocker in
+#    y)
+#    translate_docker
+#    ldap_mail
+#    ;;
+#    n)
+#    sleep 0.5
+#    ;;
+#esac
 
 
 # Ask allow internal services, mysql, postgresql, redis, mongodb
