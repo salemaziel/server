@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Sloppy af but it works
-BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )"
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )
+"
 # something else to try:
 #SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 

