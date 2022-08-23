@@ -1,0 +1,6 @@
+linux/amd64
+$ docker pull ghcr.io/tprasadtp/protonvpn:latest@sha256:5b100b81395710f4ad8ae1366850e95b48b435e82235bccbbf3a1732b828a2ca
+linux/arm/v7
+$ docker pull ghcr.io/tprasadtp/protonvpn:latest@sha256:68224b9392f166aa9715c79baf217ee5ce8b5d1b92dbdfb2da3a93ec5a798aa1
+linux/arm64
+$ docker pull ghcr.io/tprasadtp/protonvpn:latest@sha256:3528f5c9f1a79df2b6bededb4044940235dba721d622dc7e349ad2d23b345c98

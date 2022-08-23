@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#VAR1=$1
+#VAR2=$2
+
+read -p "enter the first value:" VAR1
+read -p "enter the second value:" VAR2
+
+RESULT=$(( VAR1 + VAR2 ))
+
+echo result is "$VAR1 + $VAR2 = $RESULT"
+

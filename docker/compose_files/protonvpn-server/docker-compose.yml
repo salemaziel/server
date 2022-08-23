@@ -1,0 +1,93 @@
+version: "3.4"
+services:
+  protonvpn:
+    container_name: protonvpn
+    environment:
+      # Credentials
+      PROTONVPN_USERNAME: ${PROTONVPN_USERNAME}
+      PROTONVPN_PASSWORD: ${PROTONVPN_PASSWORD}
+      # Override these where applicable
+      PROTONVPN_SERVER: ${PROTONVPN_SERVER:-NL}
+      PROTONVPN_TIER: ${PROTONVPN_TIER:-0}
+    # Always use semver tags, avoid using tag latest!
+    image: ghcr.io/tprasadtp/protonvpn:latest
+    restart: unless-stopped
+    networks:
+      - internet
+      - proxy
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    # Expose pyload container's port here!
+    expose:
+      - 8000
+
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1024
+      - PGID=101
+      - TZ=America/Los_Angeles
+      - UMASK_SET=022
+      - WEBUI_PORT=8090
+    volumes:
+      - /volume1/dockerdata/qbt/config:/config
+      - /volume1/video/Seeding:/downloads
+      - /volume1/video/Downloads:/tvdownloads
+      - /volume1/video/FilmDownloads:/filmdownloads
+      - /volume1/video/MusicDownloads:/musicdownloads
+    network_mode: service:protonvpn
+    restart: unless-stopped
+
+  prowlarr:
+    image: hotio/prowlarr:testing
+    container_name: prowlarr
+    environment:
+      - PUID=1024
+      - PGID=101
+      - TZ=GB
+    volumes:
+       - /volume1/dockerdata/prowlarr:/config
+    restart: unless-stopped
+    network_mode: service:protonvpn
+    depends_on:
+      - protonvpn
+      - qbittorrent
+
+  sonarr:
+    image: linuxserver/sonarr:preview
+    container_name: sonarr_v3
+    environment:
+      - PUID=1024
+      - PGID=101
+      - TZ=GB
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/dockerdata/sonarr/config:/config
+      - /volume1/video/TV:/tv
+      - /volume1/video/Downloads:/downloads
+    restart: unless-stopped
+    network_mode: service:protonvpn
+    depends_on:
+      - jackett
+      - qbittorrent
+
+  radarr:
+    image: linuxserver/radarr:preview
+    container_name: radarr_v3
+    environment:
+      - PUID=1024
+      - PGID=101
+      - TZ=GB
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /volume1/dockerdata/radarr3/config:/config
+      - /volume1/video/Films:/movies
+      - /volume1/video/FilmDownloads:/downloads
+    restart: unless-stopped
+    network_mode: service:protonvpn
+    depends_on:
+      - jackett
+      - qbittorrent

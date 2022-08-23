@@ -1,0 +1,47 @@
+version: "3"
+
+volumes:
+    n8n-db:
+
+networks:
+    n8n_net:
+        driver: bridge
+
+services:
+  app:
+    image: n8nio/n8n:latest
+    container_name: "n8n_app"
+    volumes:
+      - ./dot-n8n:/home/node/.n8n
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - DB_TYPE=mysqldb
+      - DB_MYSQLDB_DATABASE=${MYSQL_DATABASE}
+      - DB_MYSQLDB_HOST=db
+      - DB_MYSQLDB_PORT=3706
+      - DB_MYSQLDB_USER=${MYSQL_USER}
+      - DB_MYSQLDB_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - n8n_net
+    ports:
+      - 5678:5678
+    depends_on:
+     - db
+    restart: unless-stopped
+  db:
+    image: mysql:5.7
+    container_name: "n8n_db"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - n8n-db:/var/lib/mysql
+    networks:
+      - n8n_net
+    ports:
+      - 3307:3306
+    restart: unless-stopped

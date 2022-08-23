@@ -1,0 +1,1 @@
+https://docs.n8n.io/getting-started/installation/advanced/server-setup.html#docker-compose-example

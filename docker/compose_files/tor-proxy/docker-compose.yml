@@ -1,0 +1,9 @@
+version: '3.3'
+services:
+    tor-socks-proxy:
+        restart: always
+        container_name: tor-socks-proxy
+        ports:
+            - '127.0.0.1:9150:9150/tcp' 
+#            - '127.0.0.1:53:8853/udp' # Expose TOR's DNS port for outside container; uses 8853 instead of 53 so is non-privileged, doesn't need libcap/CAP_NET_BIND_SERVICE capability 
+        image: 'peterdavehello/tor-socks-proxy:latest'

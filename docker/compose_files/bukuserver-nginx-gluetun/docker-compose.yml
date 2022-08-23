@@ -1,0 +1,66 @@
+version: '3.7'
+
+services:
+  gluetun:
+    container_name: gluetun
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_PROVIDER}
+      - OPENVPN_USER=${OVPN_USER}
+      - OPENVPN_PASSWORD=${OVPN_PASS}
+      - COUNTRY=${COUNTRY}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+#      - SERVER_HOSTNAME=${SERVER_HOSTNAME}
+      - HTTPPROXY=on
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=America/Los_Angeles
+      - DOT=on
+#      - DOT_CACHING=off
+#      - DNS_ADDRESS=127.0.0.1
+#      - DNS_PLAINTEXT_ADDRESS=127.0.0.1
+#      - DNS_PLAINTEXT_ADDRESS=127.0.0.1
+#      - DNS_KEEP_NAMESERVER=on
+#      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+#      - PORT_FORWARDING_STATUS_FILE=/gluetun/forwarded_port
+#     secrets:
+#       - ovpn_user
+#       - ovpn_pass
+    ports:
+      # Add the port other containers use or need to expose here, instead of in their service configurations below
+      - "5001:5001" # Bukuserver
+      - "8083:80"
+      - "8040:8000" # Gluetun HTTP Control Server Port
+
+    volumes:
+      - ./gluetun-data:/gluetun
+    sysctls: # Only needed if ipv6 not disabled on system
+      - net.ipv6.conf.all.disable_ipv6=1
+    restart: unless-stopped
+
+  bukuserver:
+    image: bukuserver/bukuserver
+    restart: unless-stopped
+    environment:
+      - BUKUSERVER_PER_PAGE=100
+      - BUKUSERVER_OPEN_IN_NEW_TAB=false
+      # - BUKUSERVER_SECRET_KEY=123456789012345678901234
+      # - BUKUSERVER_URL_RENDER_MODE=full
+      # - BUKUSERVER_DISABLE_FAVICON=false
+#    ports:
+#      - "5001:5001"
+    volumes:
+      - ./buku-data:/root/.local/share/buku
+    network_mode: service:gluetun
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+#    ports:
+#      - "8083:80"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/basic_auth:/basic_auth
+    network_mode: service:gluetun
