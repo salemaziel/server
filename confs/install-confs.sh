@@ -204,12 +204,15 @@ function install-dotfiles() {
             read "dotfiles_user"
 
             echo_info "Installing dotfiles for ${dotfiles_user}"
-            mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
-            mv /home/"${dotfiles_user}"/.profile /home/"${dotfiles_user}"/.profile.original
-            cp -f "./confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
-            cp -f "./confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
-            cp -f "./confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
-
+            if [ -f "/home/${dotfiles_user}/.bash_aliases" ]; then
+              mv "/home/${dotfiles_user}/.bash_aliases" "/home/${dotfiles_user}/.bash_aliases.original"
+              mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
+              mv /home/"${dotfiles_user}"/.profile /home/"${dotfiles_user}"/.profile.original
+            else
+              cp -f "./confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
+              cp -f "./confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
+              cp -f "./confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
+            fi
         elif [ "${dotfiles_nonroot_install}" == "n" ] || [ "${dotfiles_nonroot_install}" == "N" ]; then
             echo_info "Skipping dotfiles install for non-root"
         else
