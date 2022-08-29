@@ -4,3 +4,12 @@
 [submodule "net_service_installs/docker/compose_files/media-dll"]
 	path = net_service_installs/docker/compose_files/media-dll
 	url = https://git.vdweb.link/sam/media-dl
+[submodule "net_service_installs/wireguard-manager"]
+	path = net_service_installs/wireguard-manager
+	url = https://github.com/complexorganizations/wireguard-manager
+[submodule "docker/compose_files/media-dl"]
+	path = docker/compose_files/media-dl
+	url = https://git.vdweb.link/sam/media-dl
+[submodule "docker/compose_files/dockerfiles"]
+	path = docker/compose_files/dockerfiles
+	url = https://github.com/firecat53/dockerfiles
