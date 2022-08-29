@@ -13,3 +13,12 @@
 [submodule "docker/compose_files/dockerfiles"]
 	path = docker/compose_files/dockerfiles
 	url = https://github.com/firecat53/dockerfiles
+[submodule "net_service_installs/Cloak"]
+	path = net_service_installs/Cloak
+	url = https://github.com/cbeuw/Cloak
+[submodule "net_service_installs/Cloak.wiki.git"]
+	path = net_service_installs/Cloak.wiki.git
+	url = https://github.com/cbeuw/Cloak.wiki.git
+[submodule "net_service_installs/encrypted-dns-server"]
+	path = net_service_installs/encrypted-dns-server
+	url = https://github.com/DNSCrypt/encrypted-dns-server

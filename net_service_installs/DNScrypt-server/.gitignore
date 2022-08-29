@@ -1,5 +1,0 @@
-**/*.rs.bk
-*~
-/target/
-encrypted-dns.state
-encrypted-dns.toml
