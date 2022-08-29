@@ -22,3 +22,36 @@
 [submodule "net_service_installs/encrypted-dns-server"]
 	path = net_service_installs/encrypted-dns-server
 	url = https://github.com/DNSCrypt/encrypted-dns-server
+[submodule "net_service_installs/MTProtoProxyInstaller"]
+	path = net_service_installs/MTProtoProxyInstaller
+	url = https://github.com/HirbodBehnam/MTProtoProxyInstaller
+[submodule "net_service_installs/openvpn-install"]
+	path = net_service_installs/openvpn-install
+	url = https://github.com/angristan/openvpn-install
+[submodule "net_service_installs/shadowsocks-manager"]
+	path = net_service_installs/shadowsocks-manager
+	url = https://github.com/complexorganizations/shadowsocks-manager
+[submodule "/home/pc/Public/server/dnsleaktest"]
+	path = /home/pc/Public/server/dnsleaktest
+	url = https://github.com/macvk/dnsleaktest
+[submodule "/home/pc/Public/server/sshuttle"]
+	path = /home/pc/Public/server/sshuttle
+	url = https://github.com/sshuttle/sshuttle
+[submodule "/home/pc/Public/server/netmaker"]
+	path = /home/pc/Public/server/netmaker
+	url = https://github.com/gravitl/netmaker
+[submodule "/home/pc/Public/server/gsocket"]
+	path = /home/pc/Public/server/gsocket
+	url = https://github.com/hackerschoice/gsocket
+[submodule "/home/pc/Public/server/net_dev_installs/dnsleaktest"]
+	path = /home/pc/Public/server/net_dev_installs/dnsleaktest
+	url = https://github.com/macvk/dnsleaktest
+[submodule "/home/pc/Public/server/net_dev_installs/sshuttle"]
+	path = /home/pc/Public/server/net_dev_installs/sshuttle
+	url = https://github.com/sshuttle/sshuttle
+[submodule "/home/pc/Public/server/net_dev_installs/netmaker"]
+	path = /home/pc/Public/server/net_dev_installs/netmaker
+	url = https://github.com/gravitl/netmaker
+[submodule "/home/pc/Public/server/net_dev_installs/gsocket"]
+	path = /home/pc/Public/server/net_dev_installs/gsocket
+	url = https://github.com/hackerschoice/gsocket
