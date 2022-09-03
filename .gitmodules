@@ -55,3 +55,6 @@
 [submodule "/home/pc/Public/server/net_dev_installs/gsocket"]
 	path = /home/pc/Public/server/net_dev_installs/gsocket
 	url = https://github.com/hackerschoice/gsocket
+[submodule "docker/compose_files/awesome-stacks"]
+	path = docker/compose_files/awesome-stacks
+	url = https://github.com/ethibox/awesome-stacks

@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # -Super User Check
 # -Distro check
 # -System requirements pre-check
@@ -14,7 +12,40 @@ function super-user-check() {
   fi
 }
 
-
+## Check OS
+function os-check(){
+	  if [ -f /etc/os-release ]; then
+	# freedesktop.org and systemd
+	. /etc/os-release
+	OS=$NAME
+	VER=$VERSION_ID
+  elif type lsb_release >/dev/null 2>&1; then
+	# linuxbase.org
+	OS=$(lsb_release -si)
+	VER=$(lsb_release -sr)
+  elif [ -f /etc/lsb-release ]; then
+	# For some versions of Debian/Ubuntu without lsb_release command
+	. /etc/lsb-release
+	OS=$DISTRIB_ID
+	VER=$DISTRIB_RELEASE
+  elif [ -f /etc/debian_version ]; then
+	# Older Debian/Ubuntu/etc.
+	OS=Debian
+	VER=$(cat /etc/debian_version)
+  elif [ -f /etc/SuSe-release ]; then
+	# Older SuSE/etc.
+	...
+  elif [ -f /etc/redhat-release ]; then
+	# Older Red Hat, CentOS, etc.
+	...
+  else
+	# Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+	OS=$(uname -s)
+	VER=$(uname -r)
+  fi
+  echo "OS: $OS"
+  echo "Version: $VER"
+}
 
 
 ## Detect Operating System
@@ -25,6 +56,32 @@ function dist-check() {
     DISTRO=${ID}
     DISTRO_VERSION=${VERSION_ID}
     DISTRO_CODENAME=${VERSION_CODENAME}
+
+	echo -e "Detected Distro: ${DISTRO} ${DISTRO_VERSION} codename: ${DISTRO_CODENAME}"
+  else
+	echo_warn "Unable to detect Operating System"
+	exit
+  fi
+}
+
+## Detect System Architecture
+function arch-check() {
+  ARCH=$(uname -m)
+  if [ "${ARCH}" == "x86_64" ]; then
+	ARCH="amd64"
+	echo -e "Detected Architecture: ${ARCH}"
+  elif [ "${ARCH}" == "aarch64" ]; then
+	ARCH="arm64"
+	echo -e "Detected Architecture: ${ARCH}"
+  elif [ "${ARCH}" == "armv7l" ]; then
+	ARCH="armhf"
+	echo -e "Detected Architecture: ${ARCH}"
+  elif [ "${ARCH}" == "armv6l" ]; then
+	ARCH="armhf"
+	echo -e "Detected Architecture: ${ARCH}"
+  else
+	echo -e "Couldn't detect architecture"
+	exit 1
   fi
 }
 
@@ -157,9 +214,51 @@ function checkOS() {
 
 
 
+# Check for virtualization
+function check-virt() {
+  if [ "$(systemd-detect-virt)" == "openvz" ]; then
+    echo -e "Running on OpenVZ"
+	VIRT_TYPE="openvz"
+  ## Deny LXC Virtualization
+  elif [ "$(systemd-detect-virt)" == "lxc" ]; then
+    echo -e "Running on LXC"
+	VIRT_TYPE="lxc"
+  elif [ "$(systemd-detect-virt)" == "kvm" ]; then
+	echo -e "Running on kvm"
+	VIRT_TYPE="kvm"
+  elif [ "$(systemd-detect-virt)" == "xen" ]; then
+	echo -e "Running on xen"
+	VIRT_TYPE="xen"
+  elif [ "$(systemd-detect-virt)" == "vmware" ]; then
+	echo -e "Running on vmware"
+	VIRT_TYPE="vmware"
+  elif [ "$(systemd-detect-virt)" == "oracle" ]; then
+	echo -e "Running on oracle"
+	VIRT_TYPE="oracle"
+  elif [ "$(systemd-detect-virt)" == "microsoft" ]; then
+	echo -e "Running on microsoft"
+	VIRT_TYPE="microsoft"
+  elif [ "$(systemd-detect-virt)" == "parallels" ]; then
+	echo -e "Running on parallels"
+	VIRT_TYPE="parallels"
+  elif [ "$(systemd-detect-virt)" == "container" ]; then
+	echo -e "Running on container"
+	VIRT_TYPE="container"
+  elif [ "$(systemd-detect-virt)" == "systemd-nspawn" ]; then
+	echo -e "Running on systemd-nspawn"
+	VIRT_TYPE="systemd-nspawn"
+  elif [ "$(systemd-detect-virt)" == "none" ]; then
+	echo -e "Running on bare metal"
+	VIRT_TYPE="none"
+  else
+	echo -e "Running on unknown virtualization"
+	VIRT_TYPE="unknown"
+  fi
+}
+
 
 ## Checking For Virtualization
-function virt-check() {
+function virt-unsupported-check() {
   ## Deny OpenVZ Virtualization
   if [ "$(systemd-detect-virt)" == "openvz" ]; then
     echo "OpenVZ virtualization is not supported (yet)."
@@ -173,8 +272,16 @@ function virt-check() {
 
 
 
+# Check Kernel version
+function kernel-check(){
+	KERNEL_VERSION=$(uname -r | cut -c 1-11 | cut -d - -f 1,2)
+	echo -e "Kernel Version: ${KERNEL_VERSION}"
+}
+
+
+
 ## Lets check the kernel version
-function kernel-check() {
+function kernel-supported-check() {
   KERNEL_VERSION_LIMIT=3.1
   KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
   if (($(echo "${KERNEL_CURRENT_VERSION} >= ${KERNEL_VERSION_LIMIT}" | bc -l))); then
@@ -187,3 +294,33 @@ function kernel-check() {
 
 
 
+## Check if the system is 64 bit and supported, or not and isnt
+function arch-supported-check() {
+  if [ "$(uname -m)" == "x86_64" ]; then
+	echo "Correct: Architecture x86_64 supported." >>/dev/null
+  else
+	echo "Error: Architecture $(uname -m) not supported."
+	exit
+  fi
+}
+
+
+
+## Overall system check
+function sys-check() {
+	#Check for virtualization
+	check-virt
+
+	# Check Operating System
+	os-check
+
+	# Check Distro type
+	dist-check
+
+	# Check for kernel version
+  	kernel-check
+	
+	# Check for architecture
+	arch-check
+
+}
