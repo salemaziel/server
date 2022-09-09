@@ -8,9 +8,6 @@ alias speed="speedtest-cli --single --secure"
 #alias ipcheck="curl --tlsv1.3 -4 https://ifconfig.me/all"
 alias ipcheck="curl https://ifconfig.me/all"
 alias ipinfo="curl https://ipinfo.io"
-alias lynx="lynx -force_secure"
-alias ddgr="ddgr --colorize -x --unsafe -n 25"
-alias ytdl="youtube-dl --geo-bypass --no-call-home -f mp4"
 alias ifc="ifconfig -a | grep wlp | awk '{ print $1 }' | cut -d : -f 1"
 
 alias rmrfcache="rm -rf $HOME/.cache/* && echo 'cache cleared'"
@@ -29,13 +26,6 @@ alias rmrfcache="rm -rf $HOME/.cache/* && echo 'cache cleared'"
 
 
 
-## buku bookmark manager
-#alias b="buku"
-#alias bs="buku -s"
-#alias bS="buku -S"
-#alias bsdeep="buku -s --deep"
-#alias bSdeep="buku -S --deep"
-
 
 
 alias aliases="less -R $HOME/.bash_aliases"
@@ -47,22 +37,8 @@ alias editssh="nano $HOME/.ssh/config"
 
 
 
-## Web Dev
-#alias gd="gatsby develop"
-#alias gdc="gatsby clean"
-#alias gdp="gatsby develop -p"
-#alias gbgs="gatsby build && gatsby serve"
-#alias gdcgd="gatsby clean && gatsby develop"
-#alias gdcgbgs="gatsby clean && gatsby build && gatsby serve"
-#alias ycc="yarn cache clean"
-#alias ycys="yarn cache clean && yarn start"
-#alias ycyb="yarn cache clean && yarn build"
-#alias ycybs="yarn cache clean && yarn build && yarn serve"
-#alias ghc="git clone"
-#alias sg="surge teardown"
 
 
-#alias reactget="export HERE=$PWD && cd $HOME/scripts-n-tools/react-components && bash copycomponents.sh && cd $HERE"
 
 
 

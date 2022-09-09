@@ -117,14 +117,8 @@ if ! shopt -oq posix; then
 fi
 
 
-# Fix for Tilix terminual emulator
-#if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-#        source /etc/profile.d/vte.sh
-#fi
 
 
-# Buku completion
-#source ~/.buku/buku-completion.bash
 
 # AWS CLI completion
 #complete -C '/usr/local/bin/aws_completer' aws
