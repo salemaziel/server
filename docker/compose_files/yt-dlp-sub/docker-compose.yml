@@ -1,0 +1,17 @@
+version: "2.1"
+services:
+  ytdl-sub:
+    # image: ytdl-sub:latest
+    image: ghcr.io/jmbannon/ytdl-sub:latest
+    container_name: ytdl-sub
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ./ytdlsub-config:/config
+      - ./youtube_tv_shows:/youtube_tv_shows # optional
+      - ./movies:/movies # optional
+      - ./music_videos:/music_videos # optional
+      - ./music:/music # optional
+    restart: unless-stopped

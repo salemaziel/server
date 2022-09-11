@@ -1,0 +1,107 @@
+configuration:
+  working_directory: '/tmp/ytdl-sub-downloads'
+  umask: "002"
+
+presets:
+
+  ###############################################################################
+  # Single video as an episode
+  yt_episode:
+    output_options:
+      output_directory: "{youtube_tv_shows_directory}/{show_name_sanitized}"
+      file_name: "{episode_file_path}.{ext}"
+      thumbnail_name: "{episode_file_path}-thumb.jpg"
+      info_json_name: "{episode_file_path}.{info_json_ext}"
+      maintain_download_archive: True
+
+    nfo_tags:
+      nfo_name: "{episode_file_path}.nfo"
+      nfo_root: "episodedetails"
+      kodi_safe: True
+      tags:
+        title: "{episode_title}"
+        season: "{season}"
+        episode: "{episode}"
+        year: "{upload_year}"
+        plot: "{description}"
+        aired: "{upload_date_standardized}"
+        genre: "Unset"
+
+    chapters:
+      embed_chapters: True
+
+    subtitles:
+      subtitles_name: "{episode_file_path}.{lang}.{subtitles_ext}"
+      embed_subtitles: True
+      languages: "en"
+      allow_auto_generated_subtitles: True
+  
+    overrides:
+      youtube_tv_shows_directory: "/youtube_tv_shows"
+      season: "{upload_year}"
+      episode: "{upload_month_reversed}{upload_day_reversed_padded}"
+      episode_padded: "{upload_month_reversed_padded}{upload_day_reversed_padded}"
+      episode_title: "{upload_date_standardized} - {title}"
+      episode_file_name: "s{season}.e{episode_padded} - {episode_title}"
+      episode_file_path: "Season {season}/{episode_file_name}"
+
+
+  ###############################################################################
+  # Create a TV show from a youtube playlist or channel
+  yt_show:
+    preset: "yt_episode"
+    output_directory_nfo_tags:
+      nfo_name: "tvshow.nfo"
+      nfo_root: "tvshow"
+      kodi_safe: True
+      tags:
+        title: "{show_name}"
+
+
+  ###############################################################################
+  # Entire channel as a TV show
+  yt_channel:
+    preset: "yt_show"
+    youtube:
+      download_strategy: "channel"
+      channel_avatar_path: "poster.jpg"
+      channel_banner_path: "fanart.jpg"
+
+  ###############################################################################
+  # Playlist as a TV show
+  yt_playlist:
+    preset: "yt_show"
+    youtube:
+      download_strategy: "playlist"
+    ytdl_options:
+      break_on_reject: True
+
+  ###############################################################################
+  # Only store recent videos in the last {time_to_live} timespan.
+  # Defaults to 2 months
+  only_recent:
+    output_options:
+      keep_files_after: "today-{time_to_live}"
+    date_range:
+      after: "today-{time_to_live}"
+    overrides:
+      time_to_live: "2months"
+
+  ###############################################################################
+  # For channels/playlists/etc with known sponsor content.
+  # Wait 2 days after upload for sponsorblock submissions, then cut it out.
+  sponsor_block:
+    date_range:
+      before: "today-2days"
+
+    chapters:
+      sponsorblock_categories:
+        - "outro"
+        - "selfpromo"
+        - "preview"
+        - "interaction"
+        - "sponsor"
+        - "music_offtopic"
+        - "intro"
+      remove_sponsorblock_categories: "all"
+      force_key_frames: True

@@ -58,3 +58,6 @@
 [submodule "docker/compose_files/awesome-stacks"]
 	path = docker/compose_files/awesome-stacks
 	url = https://github.com/ethibox/awesome-stacks
+[submodule "app_installs/ytdl-sub"]
+	path = app_installs/ytdl-sub
+	url = https://github.com/jmbannon/ytdl-sub
