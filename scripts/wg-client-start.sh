@@ -113,14 +113,14 @@ function choose_server_responses() {
             read -p "${ANSI_YEL}'Enter server name to see details on:${ANSI_RST} " SERVER_NAME
             check_server_details
                 echo_note "\nServer $SERVER_NAME details:"
-                echo "\n------------------------------\n"
+                echo -e "\n------------------------------\n"
                 echo -e "WG Internal IP: $SERVER_WG_IP"
                 echo -e "WG Local Listening Port: $WG_LOCAL_LISTEN_PORT \n"
                 echo -e "DNS Used: $SERVER_DNS"
                 echo -e "WG Public IP: $SERVER_END_IP_PORT"
                 echo -e "WG Public Port: $SERVER_END_IP_PORT"
                 echo -e "WG Public IP & Port: $SERVER_END_IP_PORT"
-                echo "\n------------------------------\n"
+                echo -e "\n------------------------------\n"
                 sleep 2
                 read -p "${ANSI_YEL}Choose this server? [y/n]${ANSI_RST} " -n 1 -r
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
