@@ -196,10 +196,10 @@ function install-resolved-conf() {
     if [ "${resolved_conf_install}" == "y" ] || [ "${resolved_conf_install}" == "Y" ]; then
       echo_info "Ok, installing resolved.conf.d config file"
       sleep 1
-      #cp -r -f "./confs/systemd/resolved.conf.d" /etc/systemd/resolved.conf.d
-      #chown -R root:root /etc/systemd/resolved.conf.d
-      #sudo systemctl daemon-reload && sleep 2 && sudo systemctl restart systemd-resolved
-      #rm /etc/resolv.conf && ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+      cp -r -f "./confs/systemd/resolved.conf.d" /etc/systemd/resolved.conf.d
+      chown -R root:root /etc/systemd/resolved.conf.d
+      sudo systemctl daemon-reload && sleep 2 && sudo systemctl restart systemd-resolved
+      rm /etc/resolv.conf && ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
       echo_info "Checking if we have DNS resolution and our public IP"
       curl https://ifconfig.me/all
@@ -236,15 +236,15 @@ function install-resolved-conf() {
 
 ## install grub.d kernel options file
 function install-grub-d() {
-  #cp -r -f "./confs/grub.d" /etc/default/grub.d
+  
   #test
-  mkdir -p /tmp/default/grub.d
+  #mkdir -p /tmp/default/grub.d
 
-  #cp -r -f "./confs/grub.d" /etc/default/grub.d
+  cp -r -f ./confs/grub.d/* /etc/default/grub.d
   #test
-  cp -r -f ./confs/grub.d/* /tmp/default/grub.d
+  #cp -r -f ./confs/grub.d/* /tmp/default/grub.d
   echo_info "updating grub"
-  #update-grub
+  update-grub
 }
 
 run-dotfiles-root() {
@@ -261,15 +261,15 @@ run-dotfiles-nonroot() {
   read "dotfiles_user"
 
   echo_info "Installing dotfiles for ${dotfiles_user}"
-  #            if [ -f "/home/${dotfiles_user}/.bash_aliases" ]; then
-  #              mv "/home/${dotfiles_user}/.bash_aliases" "/home/${dotfiles_user}/.bash_aliases.original"
-  #              mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
-  #              mv /home/"${dotfiles_user}"/.profile /home/"${dotfiles_user}"/.profile.original
-  #            else
-  #              cp -f "./confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
-  #              cp -f "./confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
-  #              cp -f "./confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
-  #            fi
+              if [ -f "/home/${dotfiles_user}/.bash_aliases" ]; then
+                mv "/home/${dotfiles_user}/.bash_aliases" "/home/${dotfiles_user}/.bash_aliases.original"
+                mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
+                mv /home/"${dotfiles_user}"/.profile /home/"${dotfiles_user}"/.profile.original
+              else
+                cp -f "./confs/dotfiles/.bash_aliases" /home/"${dotfiles_user}"/.bash_aliases
+                cp -f "./confs/dotfiles/.bashrc" /home/"${dotfiles_user}"/.bashrc
+                cp -f "./confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
+              fi
 }
 
 ## install dotfiles
@@ -289,7 +289,7 @@ function install-dotfiles() {
       sleep 1
 
       # run dotfiles for root
-      #           run-dotfiles-root
+                 run-dotfiles-root
 
       #          mv "$HOME/.bashrc" "$HOME/.bashrc.original"
       #          mv "$HOME/.profile" "$HOME/.profile.original"
@@ -417,8 +417,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     #testing
     echo -e "installing sshd config file"
     sleep 1
+    install-sshd-conf
   fi
-  #                        install-sshd-conf
+  #                        
 elif [[ $REPLY =~ ^[Nn]$ ]]; then
   echo -e ""
   sleep 0.5
