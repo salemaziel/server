@@ -139,7 +139,7 @@ function choose_server_responses() {
                 exit 0
                 ;;
         *-wg0)
-                check_server_details
+		check_server_details
                 start_wireguard_vpn
                 echo_note "Connected to $SERVER_NAME at $SERVER_END_IP_PORT"
                 ;;
@@ -159,7 +159,7 @@ function choose_server() {
 #    echo -e "\nAvailable servers:"
 #    echo "------------------------------"
 
-           check_available_servers
+	   check_available_servers
 
 #    echo "------------------------------"
     echo_prompt "Enter a server name to choose and connect to"
@@ -195,7 +195,7 @@ function choose_server() {
     elif [ "$SERVER_NAME" == "q" ]; then
         exit 0
     else
-        check_server_details
+	check_server_details
         start_wireguard_vpn
     fi
 

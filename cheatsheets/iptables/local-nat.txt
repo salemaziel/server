@@ -1,0 +1,30 @@
+Local NAT
+
+Use this firewall rule on a Linux client to configure it to forward outgoing HTTPS traffic to the Security Onion machine:
+
+sudo iptables -t nat -A OUTPUT -p tcp --dport 443 -j DNAT --to [SecurityOnionIP]
+
+
+
+
+Global NATNetwork 
+If the client isn't running Linux, or if you wanna forward HTTPS traffic from a whole network to the proxy, then apply the following iptables rules to the firewall in front of the client network. See "Routing Option #2" in the PolarProxy documentation for more details.
+
+Add a forward rule on the gateway to allow forwarding traffic to our PolarProxy server:
+
+sudo iptables -A FORWARD -i eth1 -d [SecurityOnionIP] -p tcp --dport 10443 -m state --state NEW -j ACCEPT
+
+
+Add a DNAT rule to forward 443 traffic to PolarProxy on port 10443:
+
+sudo iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 443 -j DNAT --to [SecurityOnionIP]:10443
+
+
+If the reverse traffic from PolarProxy to the client doesn't pass the firewall (i.e. they are on the same LAN), then we must add this hide-nat rule to fool PolarProxy that we are coming from the firewall:
+
+sudo iptables -t nat -A POSTROUTING -o eth1 -d [SecurityOnionIP] -p tcp --dport 10443 -j MASQUERADE
+
+For other network configurations, please see the various routing setups in the PolarProxy documentation.
+
+
+https://www.netresec.com/?page=Blog&month=2020-01&post=Sniffing-Decrypted-TLS-Traffic-with-Security-Onion

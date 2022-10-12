@@ -6,6 +6,10 @@ BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )
 # something else to try:
 #SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
+echo $BASE_DIR
+
+exit 0
+
 
 source $BASE_DIR/common/text-styling.sh
 source $BASE_DIR/common/sys-checks.sh
