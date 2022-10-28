@@ -150,10 +150,10 @@ alias pbpaste='xsel --clipboard --output'
 
 
 
-alias trace='mtr --report-wide --curses $1'
-alias killtcp='sudo ngrep -qK 1 $1 -d wlp0s20f3'
-alias usage='ifconfig wlp0s20f3 | grep 'bytes''
-alias connections='sudo lsof -n -P -i +c 15'
+alias trace="mtr --report-wide --curses $1"
+alias killtcp="sudo ngrep -qK 1 $1 -d wlp0s20f3"
+alias usage="ifconfig wlp0s20f3 | grep 'bytes'"
+alias connections="sudo lsof -n -P -i +c 15"
 
 ## function to make backups with date in name
 #bu() { cp $@ $@.backup-`date +%y%m%d`; echo "`date +%Y-%m-%d` backed up $PWD/$@" >> ~/.backups.log; }

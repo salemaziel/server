@@ -116,10 +116,25 @@ function install-sysctl-d() {
 function install-sshd-conf() {
 
   if [ -f /etc/ssh/sshd_config.original ]; then
-    echo_note "sshd config already installed. Skipping"
-    sleep 1
+    echo_note "sshd config already installed. \n"
+    echo_prompt "Reinstall sshd config? [ y / n ]"
+    read -r reinstall_sshd_conf
+    case $reinstall_sshd_conf in
+    Y | y)
+      echo_warn "Ok. Reinstalling sshd config."
+      sleep 1
+      ;;
+    N | n)
+      echo_note "Ok. Skipping sshd config."
+      sleep 1
+      return
+      ;;
+    *)
+      echo_fail "Invalid option. Skipping sshd config."
+      sleep 1
+      ;;
+    esac
   else
-
     CONF_NAME="Hardened SSHD Config"
     ask-install-choices
 
@@ -243,18 +258,18 @@ function install-resolved-conf() {
       curl https://ifconfig.me/all
 
     elif [ "${resolved_conf_install}" == "n" ] || [ "${resolved_conf_install}" == "N" ]; then
-      echo_warn "Skipping resolved.conf.d config file install"
+      echo_cmd "\nSkipping resolved.conf.d config file install\n"
     else
-      echo_warn "Invalid option. Skipping resolved.conf.d config file install"
+      echo_warn "\nInvalid option. Skipping resolved.conf.d config file install\n"
     fi
 
   elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
-    echo_info "Not installing resolved.conf.d config file, as i think its only an ubuntu thing"
+    echo_note "Not installing resolved.conf.d config file, as i think its only an ubuntu thing"
     sleep 2
-    echo_note "Continuing. You can install it manually if you want"
+    echo_info "Continuing. You can install it manually if you want"
     sleep 1
   else
-    echo_warn "Not installing resolved.conf.d config file, this doesnt seem to be a supported distro"
+    echo_info "Not installing resolved.conf.d config file, this doesnt seem to be a supported distro"
     sleep 2
     echo_prompt "Want to exit and check it out? [ y / n ] "
     read check_exit
@@ -284,7 +299,7 @@ function install-grub-d() {
   cp -r -f ./confs/grub.d/* /etc/default/grub.d
   #test
   #cp -r -f ./confs/grub.d/* /tmp/default/grub.d
-  echo_info "updating grub"
+  echo_info "\nupdating grub\n"
   update-grub
 }
 
@@ -309,7 +324,7 @@ run-dotfiles-nonroot() {
   echo_prompt "Enter the username of the user you want to install dotfiles for: "
   read "dotfiles_user"
 
-  echo_info "Installing dotfiles for ${dotfiles_user}"
+  echo_cmd "Installing dotfiles for ${dotfiles_user}"
               if [ -f "/home/${dotfiles_user}/.bash_aliases" ]; then
                 mv "/home/${dotfiles_user}/.bash_aliases" "/home/${dotfiles_user}/.bash_aliases.original"
                 mv /home/"${dotfiles_user}"/.bashrc /home/"${dotfiles_user}"/.bashrc.original
@@ -328,11 +343,11 @@ run-dotfiles-nonroot() {
 ## install dotfiles
 function install-dotfiles() {
 
-    echo_prompt "Do you want to install dotfiles for root? [ y / n ]"
+    echo_prompt "\nDo you want to install dotfiles for root? [ y / n ]"
     read "dotfiles_root_install"
 
     if [ "${dotfiles_root_install}" == "y" ] || [ "${dotfiles_root_install}" == "Y" ]; then
-      echo_info "Installing dotfiles for root"
+      echo_cmd "\nInstalling dotfiles for root\n"
       sleep 1
 
       # run dotfiles for root
@@ -345,21 +360,21 @@ function install-dotfiles() {
       #          cp -f "./confs/dotfiles/.profile" "$HOME/.profile"
 
     elif [ "${dotfiles_root_install}" == "n" ] || [ "${dotfiles_root_install}" == "N" ]; then
-      echo_info "Skipping dotfiles install for root"
+      echo_cmd "\nSkipping dotfiles install for root\n"
       sleep 1
-      echo_prompt "Do you want to install dotfiles for non-root? [ y / n ]"
+      echo_prompt "\nDo you want to install dotfiles for non-root? [ y / n ]\n"
       read "dotfiles_nonroot_install"
 
       if [ "${dotfiles_nonroot_install}" == "y" ] || [ "${dotfiles_nonroot_install}" == "Y" ]; then
         run-dotfiles-nonroot
       elif [ "${dotfiles_nonroot_install}" == "n" ] || [ "${dotfiles_nonroot_install}" == "N" ]; then
-        echo_info "Skipping dotfiles install for non-root"
+        echo_cmd "\nSkipping dotfiles install for non-root\n"
       else
-        echo_warn "Invalid option. Skipping dotfiles install for non-root"
+        echo_warn "\nInvalid option. Skipping dotfiles install for non-root\n"
       fi
 
     fi
-    echo_prompt "Do you want to install dotfiles for non-root? [ y / n ]"
+    echo_prompt "\nDo you want to install dotfiles for non-root? [ y / n ]\n"
     read "dotfiles_nonroot_install"
     if [ "${dotfiles_nonroot_install}" == "y" ] || [ "${dotfiles_nonroot_install}" == "Y" ]; then
 
@@ -379,9 +394,9 @@ function install-dotfiles() {
       #              cp -f "./confs/dotfiles/.profile" /home/"${dotfiles_user}"/.profile
       #            fi
     elif [ "${dotfiles_nonroot_install}" == "n" ] || [ "${dotfiles_nonroot_install}" == "N" ]; then
-      echo_info "Skipping dotfiles install for non-root"
+      echo_cmd "\nSkipping dotfiles install for non-root\n"
     else
-      echo_warn "Invalid option. Skipping dotfiles install for non-root"
+      echo_warn "\nInvalid option. Skipping dotfiles install for non-root\n"
     fi
 
 }
@@ -391,14 +406,14 @@ function install-dotfiles() {
 
 ## Ask to Install
 ask-to-install() {
-  echo_prompt "Do you want to install the following? [ y / n ]"
+  echo_prompt "Enter number response to install the following: \n"
   echo_info "1. Install grub.d kernel options file"
   echo_info "2. Install resolved.conf.d config file"
   echo_info "3. Install dotfiles"
   echo_info "4. Install sshd_config"
   echo_info "5. Install all of the above"
   echo_info "6. Install nothing; let me choose individually"
-  read "install_options"
+  read -rp "Enter choice: " "install_options"
   if [ "$install_options" == "1" ]; then
     install-grub-d
   elif [ "$install_options" == "2" ]; then
@@ -406,15 +421,16 @@ ask-to-install() {
   elif [ "$install_options" == "3" ]; then
     install-dotfiles
   elif [ "$install_options" == "4" ]; then
-    install-sshd-config
+    install-sshd-conf
   elif [ "$install_options" == "5" ]; then
     install-grub-d
     install-resolved-conf
+    install-sysctl-d
     install-dotfiles
-    install-sshd-config
+    install-sshd-conf
   elif [ "$install_options" == "6" ]; then
-    echo_warn "Skipping all options \n"
-    echo_warn "You will be prompted to install each option individually \n"
+    echo_cmd "\nSkipping all options"
+    echo_note "You will be prompted to install each option individually \n"
     sleep 1
     
     ask-install-dotfiles
@@ -470,7 +486,7 @@ read -p "${ANSI_YEL}Install sysctl.d config file? [ y / n ]${ANSI_RST} " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   install-sysctl-d
 elif [[ $REPLY =~ ^[Nn]$ ]]; then
-  echo -e ""
+  echo -e "\n Skipping sysctl.d config file \n"
   sleep 0.5
 else
   echo_fail "\nInvalid input\n"
@@ -485,17 +501,17 @@ read -p "${ANSI_YEL}Install sshd config file? [ y / n ]${ANSI_RST} " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
 
   if [ -f /etc/ssh/sshd_config.original ]; then
-    echo_note "Sshd config already installed. Skipping"
+    echo_note "sshd config already installed. Skipping \n"
     sleep 1
   else
     #testing
-    echo -e "installing sshd config file"
+    echo -e "\n installing sshd config file \n"
     sleep 1
     install-sshd-conf
   fi
   #                        
 elif [[ $REPLY =~ ^[Nn]$ ]]; then
-  echo -e "Not installing sshd config"
+  echo -e "\nNot installing sshd config \n"
   sleep 0.5
 else
   echo_fail "\nInvalid input. Skipping installing sshd config\n"

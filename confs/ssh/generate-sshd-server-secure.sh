@@ -3,8 +3,8 @@
 ubuntu-2204-generate() {
     ##    Re-generate the RSA and ED25519 keys
     rm /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     #    Remove small Diffie-Hellman moduli
     awk '$5 >= 3071' /etc/ssh/moduli >/etc/ssh/moduli.safe
@@ -25,8 +25,8 @@ ubuntu-2004-generate() {
     ##    Re-generate the RSA and ED25519 keys
 
     rm /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     #    Remove small Diffie-Hellman moduli
     awk '$5 >= 3071' /etc/ssh/moduli >/etc/ssh/moduli.safe
@@ -49,8 +49,8 @@ ubuntu-1804-generate() {
 
     ##    Re-generate the RSA and ED25519 keys
     rm /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     #    Remove small Diffie-Hellman moduli
     awk '$5 >= 3071' /etc/ssh/moduli >/etc/ssh/moduli.safe
@@ -71,8 +71,8 @@ ubuntu-1804-core-generate() {
 
     ##    Re-generate the RSA and ED25519 keys
     #    Note: It is highly recommended that you run the ssh-keygen commands below on another host. Some IoT devices do not have good entropy sources to generate sufficient keys with!
-    ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key #""
+    ssh-keygen -t ed25519 -f ssh_host_ed25519_key #-N ""
 
     #    Be sure to upload the following 4 files to the target device's /etc/ssh directory:
     ssh_host_ed25519_key
@@ -96,7 +96,7 @@ ubuntu-1604-generate() {
 
     #    Re-generate ED25519 key
     rm /etc/ssh/ssh_host_*
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     #    Remove small Diffie-Hellman moduli
     awk '$5 >= 3071' /etc/ssh/moduli >/etc/ssh/moduli.safe
@@ -117,8 +117,8 @@ debian-11-bullseye-generate() {
 
     ## Re-generate the RSA and ED25519 keys
     rm -f /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     # Enable the RSA and ED25519 keys
     ## Enable the RSA and ED25519 HostKey directives in the /etc/ssh/sshd_config file:
@@ -139,8 +139,8 @@ debian-10-buster-generate() {
 
     # Re-generate the RSA and ED25519 keys
     rm -f /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     # Enable the RSA and ED25519 keys
     ## Enable the RSA and ED25519 HostKey directives in the /etc/ssh/sshd_config file:
@@ -161,8 +161,8 @@ rhel-centos-8-generate() {
 
     #   Re-generate the RSA and ED25519 keys
     rm -f /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
     chgrp ssh_keys /etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_rsa_key
     chmod g+r /etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_rsa_key
 
@@ -191,7 +191,7 @@ rhel-centos-7-generate() {
 
     # Re-generate the ED25519 key
     rm -f /etc/ssh/ssh_host_*
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
     chgrp ssh_keys /etc/ssh/ssh_host_ed25519_key
     chmod g+r /etc/ssh/ssh_host_ed25519_key
 
@@ -215,8 +215,8 @@ pfsense-2.4-generate() {
 
     #    Re-generate the RSA and ED25519 keys
     rm /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     #    Remove small Diffie-Hellman moduli
     awk '$5 >= 3071' /etc/ssh/moduli >/etc/ssh/moduli.safe
@@ -235,8 +235,8 @@ openbsd-6.2-generate() {
 
     #    Re-generate the RSA and ED25519 keys
     rm /etc/ssh/ssh_host_*
-    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
-    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+    ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key #-N ""
+    ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key #-N ""
 
     #    Create custom Diffie-Hellman groups
     ssh-keygen -G /etc/ssh/moduli -b 3072
