@@ -35,8 +35,8 @@ echo_debug() { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
 # shellcheck disable=SC2145
 echo_fail() { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 
-# shellcheck source=./install-conf-functions
-source ./install-conf-functions
+# shellcheck source=./confs/install-conf-functions
+source ./confs/install-conf-functions
 
 ## Require script to be run as root
 super-user-check

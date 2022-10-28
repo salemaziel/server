@@ -34,6 +34,9 @@ echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 MY_DIR="$(realpath .)"
 
 
+# Syschecks
+source $MY_DIR/common/sys-checks
+
 # Add text styling
 # shellcheck source=common/text-styling.sh
 source "$MY_DIR"/common/text-styling.sh
@@ -43,6 +46,9 @@ source "$MY_DIR"/common/text-styling.sh
 # shellcheck source=common/create-new-user.sh
 source "$MY_DIR"/common/create-new-user.sh
 
+
+# check if root or using sudo
+super-user-check
 
 # Choice to add new user with sudo privs
 create-sudo-user
