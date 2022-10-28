@@ -1,0 +1,98 @@
+
+## sudo kill -SIGHUP $(pgrep -f "sshd -D")
+
+## Re-generate the RSA and ED25519 keys:
+# rm /etc/ssh/ssh_host_*
+# ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ""
+# ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ""
+
+Remove small Diffie-Hellman moduli
+# awk '$5 >= 3071' /etc/ssh/moduli > /etc/ssh/moduli.safe
+# mv /etc/ssh/moduli.safe /etc/ssh/moduli
+
+
+Protocol 2
+StrictModes yes
+ 
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+
+HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com
+KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,gss-curve25519-sha256-,diffie-hellman-group16-sha512,gss-group16-sha512-,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+
+Port 22
+ListenAddress 0.0.0.0
+AddressFamily any
+
+PermitRootLogin no
+PermitEmptyPasswords no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+GSSAPIAuthentication no
+KerberosAuthentication no
+
+AuthenticationMethods publickey
+PubkeyAuthentication yes
+AuthorizedKeysFile	.ssh/authorized_keys
+
+IgnoreRhosts yes
+IgnoreUserKnownHosts yes
+HostbasedAuthentication no
+
+MaxAuthTries 5
+MaxSessions 2
+MaxStartups 2 
+
+ClientAliveInterval 300
+ClientAliveCountMax 2
+TCPKeepAlive no
+
+PermitTunnel no
+X11Forwarding no
+AllowAgentForwarding no
+AllowTcpForwarding no
+AllowStreamLocalForwarding no
+GatewayPorts no   
+DisableForwarding yes
+
+Compression no
+
+AcceptEnv LANG LC_*
+PermitUserEnvironment no
+
+#Subsystem	sftp	/usr/lib/openssh/sftp-server
+Subsystem sftp  /usr/lib/ssh/sftp-server -f AUTHPRIV -l INFO
+
+SyslogFacility AUTH
+LogLevel VERBOSE
+PrintLastLog yes
+
+UseDNS no
+
+PermitTTY yes
+
+#AllowUsers user1 user2 user3
+#AllowGroups group1 staff mybackups
+
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#ChrootDirectory none
+#VersionAddendum none
+
+## Receive Email alerts on root access; must have mailx package installed
+# echo "ALERT - Root Shell Access (ServerName) on:" `date` `who` | mail -s "Alert: Root Access from `who | cut -d"(" -f2 | cut -d")" -f1`" your@email.com
+
+
+####   SOURCES:  #####
+## https://securitytrails.com/blog/mitigating-ssh-based-attacks-top-15-best-security-practices
+
+## https://askubuntu.com/questions/462968/take-changes-in-file-sshd-config-file-without-server-reboot
+
+## https://stribika.github.io/2015/01/04/secure-secure-shell.html
+
+## https://www.ssh-audit.com/hardening_guides.html
+

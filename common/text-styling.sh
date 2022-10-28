@@ -3,6 +3,9 @@
 # Text Styles
 readonly ESC_SEQ="\x1b["
 readonly COL_RESET=$ESC_SEQ"39;49;00m"
+
+
+
 readonly TEXT_NORMAL=$ESC_SEQ"0m"
 
 readonly TEXT_BLINK=$ESC_SEQ"5m"
@@ -46,6 +49,36 @@ readonly COL_GRAY_LITE=$ESC_SEQ"37;01m"
 
 readonly COL_WHITE=$ESC_SEQ"97;01m"
 
+export ESC_SEQ
+export COL_RESET
+export TEXT_NORMAL
+export TEXT_BLINK
+export TEXT_BLINK_RESET
+export TEXT_HIDDEN
+export TEXT_HIDDEN_RESET
+export TEXT_COLOR_INVERSE
+export TEXT_INVERSE_RESET
+export TEXT_BOLD
+export TEXT_BOLD_RESET
+export TEXT_BOLD_OFF
+export TEXT_UNDERLINE
+export TEXT_UNDERLINE_RESET
+
+export COL_RED
+export COL_RED_LITE
+export COL_GREEN
+export COL_GREEN_LITE
+export COL_YELLOW
+export COL_YELLOW_LITE
+export COL_BLUE
+export COL_BLUE_LITE
+export COL_MAGENTA
+export COL_MAGENTA_LITE
+export COL_CYAN
+export COL_CYAN_LITE
+export COL_GRAY
+export COL_GRAY_LITE
+export COL_WHITE
 
 
 
@@ -61,10 +94,17 @@ ANSI_BLU=$'\033[1;36m'
 ANSI_WHT=$'\033[1;37m'
 ANSI_RST=$'\033[0m'
 
+# shellcheck disable=SC2145
 echo_cmd()    { echo -e "${ANSI_BLU}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_prompt() { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_note()   { echo -e "${ANSI_GRN}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_info()   { echo -e "${ANSI_WHT}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_warn()   { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_debug()  { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }

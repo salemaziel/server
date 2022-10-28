@@ -70,8 +70,3 @@ add_usersudo() {
     sleep 2
 }
 
-
-
-
-#create-sudo-user
-

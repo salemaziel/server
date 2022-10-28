@@ -12,12 +12,19 @@ ANSI_BLU=$'\033[1;36m'
 ANSI_WHT=$'\033[1;37m'
 ANSI_RST=$'\033[0m'
 
+# shellcheck disable=SC2145
 echo_cmd()    { echo -e "${ANSI_BLU}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_prompt() { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_note()   { echo -e "${ANSI_GRN}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_info()   { echo -e "${ANSI_WHT}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_warn()   { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_debug()  { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
+# shellcheck disable=SC2145
 echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 
 
@@ -28,10 +35,12 @@ MY_DIR="$(realpath .)"
 
 
 # Add text styling
+# shellcheck source=common/text-styling.sh
 source "$MY_DIR"/common/text-styling.sh
 
 # Add functions
 #source "$MY_DIR"/common/functions.sh
+# shellcheck source=common/create-new-user.sh
 source "$MY_DIR"/common/create-new-user.sh
 
 
