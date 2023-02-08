@@ -14,12 +14,25 @@ ANSI_BLU=$'\033[1;36m'
 ANSI_WHT=$'\033[1;37m'
 ANSI_RST=$'\033[0m'
 
+# shellcheck disable=SC2145
 echo_cmd()    { echo -e "${ANSI_BLU}${@}${ANSI_RST}"; }
+
+# shellcheck disable=SC2145
 echo_prompt() { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+
+# shellcheck disable=SC2145
 echo_note()   { echo -e "${ANSI_GRN}${@}${ANSI_RST}"; }
+
+# shellcheck disable=SC2145
 echo_info()   { echo -e "${ANSI_WHT}${@}${ANSI_RST}"; }
+
+# shellcheck disable=SC2145
 echo_warn()   { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
+
+# shellcheck disable=SC2145
 echo_debug()  { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
+
+# shellcheck disable=SC2145
 echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 
 
@@ -32,11 +45,14 @@ echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 
 SERVER_NAME=
 SERVER_WG_IP=
-WG_LOCAL_LISTEN_PORT=
+#WG_LOCAL_LISTEN_PORT=
 SERVER_DNS=
 SERVER_END_IP=
+#SERVER_END_DOMAINNAME=
 SERVER_END_PORT=
 SERVER_END_IP_PORT="$SERVER_END_IP:$SERVER_END_PORT"
+#SERVER_END_DOMAINNAME_PORT="$SERVER_END_DOMAINNAME:$SERVER_END_PORT"
+#SERVER_END_HOST="$SERVER_END_DOMAINNAME:-SERVER_END_IP"
 STOPWG=/usr/local/bin/wgstop.sh
 
 
@@ -62,13 +78,13 @@ function check_wg_running() {
     if [ -n "$(check_for_interface)" ]; then
         CHECK="$(check_for_interface)"
         echo_warn "\nWireGuard connection $CHECK is already running\n"
-        read -p "${ANSI_GRN}Disconnect from $CHECK ? [y/n]${ANSI_RST} " -n 1 -r
+        read -p "${ANSI_WHT}Disconnect from $CHECK ? [y/n]${ANSI_RST} " -n 1 -r
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             echo_cmd "\nDisconnecting from $CHECK\n"
             ${STOPWG}
-            sleep 1
+            sleep 0.5
         elif [[ $REPLY =~ ^[Nn]$ ]]; then
-            echo_note "\nExiting"
+            echo_cmd "\nExiting"
             exit 0
         else
             echo_warn "\nInvalid input"
@@ -82,21 +98,28 @@ function check_available_servers() {
     echo_note "\nNames of Servers Available:"
     echo_note "------------------------------\n"
     sudo ls /etc/wireguard/ | cut -d . -f 1
-    echo_note "\n------------------------------\n"
+    ## Below: Display vpn options with numbers e.g. 1) vpn1-wgo
+#    sudo ls /etc/wireguard/ | cut -d . -f 1 | sed 's/^/) /' | sed '/./=' | sed '/./N; s/\n//'
 
-#    sudo ls /etc/wireguard/ | cut -d . -f 1
+## Below: display numbered vpn options and then printing without the numbers ; e.g. 1) vpn1-wgo  will print as just vpn1-wgo
+# Supposed to be for giving numbered options when choosing vpn instead of entering full vpn name... probably an easier way to do this though
+#   sudo ls /etc/wireguard/ | cut -d . -f 1 | sed 's/^/) /' | sed '/./=' | sed '/./N; s/\n//' | awk '{ print $2 }'
+
+    echo_note "\n------------------------------\n"
 }
 
 
 function check_server_details() {
     for i in $(check_available_servers) ; do
         if [ "$i" == "$SERVER_NAME" ]; then
-            SERVER_WG_IP=$(sudo cat /etc/wireguard/$i.conf | grep "Address" | cut -d " " -f 3 | tail -n 1)
-            WG_LOCAL_LISTEN_PORT=$(sudo cat /etc/wireguard/$i.conf | grep "ListenPort" | cut -d " " -f 3)
-            SERVER_DNS=$(sudo cat /etc/wireguard/$i.conf | grep "DNS" | cut -d " " -f 3 | tail -n 1)
-            SERVER_END_IP=$(sudo cat /etc/wireguard/$i.conf | grep "Endpoint" | cut -d " " -f 3 | cut -d : -f 1)
-            SERVER_END_PORT=$(sudo cat /etc/wireguard/$i.conf | grep "Endpoint" | cut -d : -f 2)
+            SERVER_WG_IP=$(sudo cat /etc/wireguard/"${i}".conf | grep "Address" | cut -d " " -f 3 | tail -n 1)
+#            WG_LOCAL_LISTEN_PORT=$(sudo cat /etc/wireguard/"${i}".conf | grep "ListenPort" | cut -d " " -f 3)
+            SERVER_DNS=$(sudo cat /etc/wireguard/"${i}".conf | grep "DNS" | cut -d " " -f 3 | tail -n 1)
+            SERVER_END_IP=$(sudo cat /etc/wireguard/"${i}".conf | grep "Endpoint" | cut -d " " -f 3 | cut -d : -f 1)
+#            SERVER_END_DOMAINNAME=$(sudo cat /etc/wireguard/"${i}".conf | grep "Endpoint" | cut -d " " -f 3 | cut -d : -f 1)
+            SERVER_END_PORT=$(sudo cat /etc/wireguard/"${i}".conf | grep "Endpoint" | cut -d : -f 2)
             SERVER_END_IP_PORT="$SERVER_END_IP:$SERVER_END_PORT"
+#            SERVER_END_DOMAINNAME_PORT="$SERVER_DOMAINNAME:$SERVER_END_PORT"
             break
         fi
     done
@@ -104,7 +127,7 @@ function check_server_details() {
 
 function start_wireguard_vpn() {
     sudo systemctl start wg-quick@"$SERVER_NAME"
-    echo_note "\nConnected to $SERVER_NAME at $SERVER_END_IP_PORT"
+    echo -e "\nConnected to ${ANSI_GRN}$SERVER_NAME${ANSI_RST} at ${ANSI_GRN}$SERVER_END_IP_PORT${ANSI_RST}"
 }
 
 function choose_server_responses() {
@@ -113,14 +136,14 @@ function choose_server_responses() {
             read -p "${ANSI_YEL}'Enter server name to see details on:${ANSI_RST} " SERVER_NAME
             check_server_details
                 echo_note "\nServer $SERVER_NAME details:"
-                echo -e "\n------------------------------\n"
+                echo "\n------------------------------\n"
                 echo -e "WG Internal IP: $SERVER_WG_IP"
-                echo -e "WG Local Listening Port: $WG_LOCAL_LISTEN_PORT \n"
+#                echo -e "WG Local Listening Port: $WG_LOCAL_LISTEN_PORT \n"
                 echo -e "DNS Used: $SERVER_DNS"
                 echo -e "WG Public IP: $SERVER_END_IP_PORT"
                 echo -e "WG Public Port: $SERVER_END_IP_PORT"
                 echo -e "WG Public IP & Port: $SERVER_END_IP_PORT"
-                echo -e "\n------------------------------\n"
+                echo "\n------------------------------\n"
                 sleep 2
                 read -p "${ANSI_YEL}Choose this server? [y/n]${ANSI_RST} " -n 1 -r
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -138,7 +161,7 @@ function choose_server_responses() {
         q|Q)
                 exit 0
                 ;;
-        *-wg0)
+        *wg0)
 		check_server_details
                 start_wireguard_vpn
                 echo_note "Connected to $SERVER_NAME at $SERVER_END_IP_PORT"
@@ -174,7 +197,7 @@ function choose_server() {
                 echo_note "\nServer $SERVER_NAME details:"
                 echo_note "------------------------------\n"
                 echo -e "${ANSI_BLU}WG Internal IP:${ANSI_RST} $SERVER_WG_IP"
-                echo -e "${ANSI_BLU}WG Local Listening Port:${ANSI_RST} $WG_LOCAL_LISTEN_PORT \n"
+#                echo -e "${ANSI_BLU}WG Local Listening Port:${ANSI_RST} $WG_LOCAL_LISTEN_PORT \n"
                 echo -e "${ANSI_BLU}DNS Used:${ANSI_RST} $SERVER_DNS"
                 echo -e "${ANSI_BLU}WG Public IP:${ANSI_RST} $SERVER_END_IP_PORT"
                 echo -e "${ANSI_BLU}WG Public Port:${ANSI_RST} $SERVER_END_IP_PORT\n"

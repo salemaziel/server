@@ -1,4 +1,4 @@
- Step 1 - Make sure the drive Security is not frozen:
+# Step 1 - Make sure the drive Security is not frozen:
 
 Issue the following command, where "X" matches your device (eg. sda).
 
