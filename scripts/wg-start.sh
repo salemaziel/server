@@ -6,41 +6,20 @@ set -euo pipefail
 
 
 # Add Color
-readonly ANSI_RED=$'\033[1;31m'
-readonly ANSI_YEL=$'\033[1;33m'
-readonly ANSI_GRN=$'\033[1;32m'
-readonly ANSI_VIO=$'\033[1;35m'
-readonly ANSI_BLU=$'\033[1;36m'
-readonly ANSI_WHT=$'\033[1;37m'
-readonly ANSI_RST=$'\033[0m'
+ANSI_RED=$'\033[1;31m'
+ANSI_YEL=$'\033[1;33m'
+ANSI_GRN=$'\033[1;32m'
+ANSI_VIO=$'\033[1;35m'
+ANSI_BLU=$'\033[1;36m'
+ANSI_WHT=$'\033[1;37m'
+ANSI_RST=$'\033[0m'
 
-
-display_message() {
-  local color="$1"
-  shift
-  # shellcheck disable=SC2145
-  echo -e "${color}${@}${ANSI_RST}"
-}
-
-# shellcheck disable=SC2145
 echo_cmd()    { echo -e "${ANSI_BLU}${@}${ANSI_RST}"; }
-
-# shellcheck disable=SC2145
 echo_prompt() { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
-
-# shellcheck disable=SC2145
 echo_note()   { echo -e "${ANSI_GRN}${@}${ANSI_RST}"; }
-
-# shellcheck disable=SC2145
 echo_info()   { echo -e "${ANSI_WHT}${@}${ANSI_RST}"; }
-
-# shellcheck disable=SC2145
 echo_warn()   { echo -e "${ANSI_YEL}${@}${ANSI_RST}"; }
-
-# shellcheck disable=SC2145
 echo_debug()  { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
-
-# shellcheck disable=SC2145
 echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 
 
@@ -51,13 +30,14 @@ echo_fail()   { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 #SERVER_END_IP=6.6.6.6
 #SERVER_END_PORT=51820
 
-readonly SERVER_NAME=
-readonly SERVER_WG_IP=
-readonly SERVER_DNS=
-readonly SERVER_END_IP=
-readonly SERVER_END_PORT=
+SERVER_NAME=
+SERVER_WG_IP=
+WG_LOCAL_LISTEN_PORT=
+SERVER_DNS=
+SERVER_END_IP=
+SERVER_END_PORT=
 SERVER_END_IP_PORT="$SERVER_END_IP:$SERVER_END_PORT"
-readonly STOPWG=/usr/local/bin/wgstop.sh
+STOPWG=/usr/local/bin/wgstop.sh
 
 
 # Check if WireGuard is installed
@@ -78,7 +58,6 @@ function check_for_interface(){
 }
 
 # Check if Wireguard is already running
-#  This function checks if a WireGuard connection is already running by using the ifconfig command to check for the wg0 interface. If a connection is already running, the user is prompted to disconnect before continuing with the script.
 function check_wg_running() {
     if [ -n "$(check_for_interface)" ]; then
         CHECK="$(check_for_interface)"
@@ -98,13 +77,12 @@ function check_wg_running() {
     fi
 }
 
-# This function displays a list of available servers by listing the contents of the /etc/wireguard/ directory and printing the names of the files.
 function check_available_servers() {
 
     echo_note "\nNames of Servers Available:"
     echo_note "------------------------------\n"
     sudo ls /etc/wireguard/ | cut -d . -f 1
-    ## Below: Display vpn options with numbers e.g. 1) vpn1-wgo
+## Below: Display vpn options with numbers e.g. 1) vpn1-wgo
 #    sudo ls /etc/wireguard/ | cut -d . -f 1 | sed 's/^/) /' | sed '/./=' | sed '/./N; s/\n//'
 
 ## Below: display numbered vpn options and then printing without the numbers ; e.g. 1) vpn1-wgo  will print as just vpn1-wgo
@@ -114,24 +92,24 @@ function check_available_servers() {
     echo_note "\n------------------------------\n"
 }
 
-# This function retrieves the details of a specified server by reading the contents of its configuration file in the /etc/wireguard/ directory.
+
 function check_server_details() {
     for i in $(check_available_servers) ; do
         if [ "$i" == "$SERVER_NAME" ]; then
-            SERVER_WG_IP=$(sudo cat /etc/wireguard/"${i}".conf | grep "Address" | cut -d " " -f 3 | tail -n 1)
-            SERVER_DNS=$(sudo cat /etc/wireguard/"${i}".conf | grep "DNS" | cut -d " " -f 3 | tail -n 1)
-            SERVER_END_IP=$(sudo cat /etc/wireguard/"${i}".conf | grep "Endpoint" | cut -d " " -f 3 | cut -d : -f 1)
-            SERVER_END_PORT=$(sudo cat /etc/wireguard/"${i}".conf | grep "Endpoint" | cut -d : -f 2)
+            SERVER_WG_IP=$(sudo cat /etc/wireguard/$i.conf | grep "Address" | cut -d " " -f 3 | tail -n 1)
+            WG_LOCAL_LISTEN_PORT=$(sudo cat /etc/wireguard/$i.conf | grep "ListenPort" | cut -d " " -f 3)
+            SERVER_DNS=$(sudo cat /etc/wireguard/$i.conf | grep "DNS" | cut -d " " -f 3 | tail -n 1)
+            SERVER_END_IP=$(sudo cat /etc/wireguard/$i.conf | grep "Endpoint" | cut -d " " -f 3 | cut -d : -f 1)
+            SERVER_END_PORT=$(sudo cat /etc/wireguard/$i.conf | grep "Endpoint" | cut -d : -f 2)
             SERVER_END_IP_PORT="$SERVER_END_IP:$SERVER_END_PORT"
             break
         fi
     done
 }
 
-# This function starts the VPN connection by using the sudo systemctl start command to start the wg-quick service for the specified server.
 function start_wireguard_vpn() {
     sudo systemctl start wg-quick@"$SERVER_NAME"
-    echo -e "\nConnected to ${ANSI_GRN}$SERVER_NAME${ANSI_RST} at ${ANSI_GRN}$SERVER_END_IP_PORT${ANSI_RST}"
+    echo_note "\nConnected to $SERVER_NAME at $SERVER_END_IP_PORT"
 }
 
 function choose_server_responses() {
@@ -140,14 +118,14 @@ function choose_server_responses() {
             read -p "${ANSI_YEL}'Enter server name to see details on:${ANSI_RST} " SERVER_NAME
             check_server_details
                 echo_note "\nServer $SERVER_NAME details:"
-                echo -e "\n------------------------------\n"
+                echo "\n------------------------------\n"
                 echo -e "WG Internal IP: $SERVER_WG_IP"
-#                echo -e "WG Local Listening Port: $WG_LOCAL_LISTEN_PORT \n"
+                echo -e "WG Local Listening Port: $WG_LOCAL_LISTEN_PORT \n"
                 echo -e "DNS Used: $SERVER_DNS"
                 echo -e "WG Public IP: $SERVER_END_IP_PORT"
                 echo -e "WG Public Port: $SERVER_END_IP_PORT"
                 echo -e "WG Public IP & Port: $SERVER_END_IP_PORT"
-                echo -e "\n------------------------------\n"
+                echo "\n------------------------------\n"
                 sleep 2
                 read -p "${ANSI_YEL}Choose this server? [y/n]${ANSI_RST} " -n 1 -r
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -165,7 +143,7 @@ function choose_server_responses() {
         q|Q)
                 exit 0
                 ;;
-        *wg0)
+        *-wg0)
 		check_server_details
                 start_wireguard_vpn
                 echo_note "Connected to $SERVER_NAME at $SERVER_END_IP_PORT"
@@ -176,15 +154,19 @@ function choose_server_responses() {
     esac
 }
 
-# This function allows the user to choose a server by displaying the list of available servers, prompting the user to enter the name of a server, and starting the VPN connection if a valid server name is entered. If the user enters "d", they can see the details of a server, and if they enter "q", the script will exit.
+
 function choose_server() {
     echo -e "\n${ANSI_YEL}Checking available servers needs sudo access${ANSI_RST}\n"
     sudo -v
     echo_cmd "Checking available servers...\n"
     sleep 0.5
 
+#    echo -e "\nAvailable servers:"
+#    echo "------------------------------"
+
 	   check_available_servers
 
+#    echo "------------------------------"
     echo_prompt "Enter a server name to choose and connect to"
     sleep 0.5
     echo_info "Enter d to see a server's details"
@@ -197,6 +179,7 @@ function choose_server() {
                 echo_note "\nServer $SERVER_NAME details:"
                 echo_note "------------------------------\n"
                 echo -e "${ANSI_BLU}WG Internal IP:${ANSI_RST} $SERVER_WG_IP"
+                echo -e "${ANSI_BLU}WG Local Listening Port:${ANSI_RST} $WG_LOCAL_LISTEN_PORT \n"
                 echo -e "${ANSI_BLU}DNS Used:${ANSI_RST} $SERVER_DNS"
                 echo -e "${ANSI_BLU}WG Public IP:${ANSI_RST} $SERVER_END_IP_PORT"
                 echo -e "${ANSI_BLU}WG Public Port:${ANSI_RST} $SERVER_END_IP_PORT\n"

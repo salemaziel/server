@@ -14,14 +14,6 @@ readonly ANSI_BLU=$'\033[1;36m'
 readonly ANSI_WHT=$'\033[1;37m'
 readonly ANSI_RST=$'\033[0m'
 
-
-display_message() {
-  local color="$1"
-  shift
-  # shellcheck disable=SC2145
-  echo -e "${color}${@}${ANSI_RST}"
-}
-
 # shellcheck disable=SC2145
 echo_cmd()    { echo -e "${ANSI_BLU}${@}${ANSI_RST}"; }
 
@@ -78,7 +70,6 @@ function check_for_interface(){
 }
 
 # Check if Wireguard is already running
-#  This function checks if a WireGuard connection is already running by using the ifconfig command to check for the wg0 interface. If a connection is already running, the user is prompted to disconnect before continuing with the script.
 function check_wg_running() {
     if [ -n "$(check_for_interface)" ]; then
         CHECK="$(check_for_interface)"
@@ -98,7 +89,6 @@ function check_wg_running() {
     fi
 }
 
-# This function displays a list of available servers by listing the contents of the /etc/wireguard/ directory and printing the names of the files.
 function check_available_servers() {
 
     echo_note "\nNames of Servers Available:"
@@ -114,7 +104,7 @@ function check_available_servers() {
     echo_note "\n------------------------------\n"
 }
 
-# This function retrieves the details of a specified server by reading the contents of its configuration file in the /etc/wireguard/ directory.
+
 function check_server_details() {
     for i in $(check_available_servers) ; do
         if [ "$i" == "$SERVER_NAME" ]; then
@@ -128,7 +118,6 @@ function check_server_details() {
     done
 }
 
-# This function starts the VPN connection by using the sudo systemctl start command to start the wg-quick service for the specified server.
 function start_wireguard_vpn() {
     sudo systemctl start wg-quick@"$SERVER_NAME"
     echo -e "\nConnected to ${ANSI_GRN}$SERVER_NAME${ANSI_RST} at ${ANSI_GRN}$SERVER_END_IP_PORT${ANSI_RST}"
@@ -176,7 +165,7 @@ function choose_server_responses() {
     esac
 }
 
-# This function allows the user to choose a server by displaying the list of available servers, prompting the user to enter the name of a server, and starting the VPN connection if a valid server name is entered. If the user enters "d", they can see the details of a server, and if they enter "q", the script will exit.
+
 function choose_server() {
     echo -e "\n${ANSI_YEL}Checking available servers needs sudo access${ANSI_RST}\n"
     sudo -v

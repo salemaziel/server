@@ -1,0 +1,73 @@
+-P INPUT ACCEPT
+-P FORWARD DROP
+-P OUTPUT ACCEPT
+-N CLOUDRON
+-N CLOUDRON_RATELIMIT
+-N CLOUDRON_RATELIMIT_LOG
+-N DOCKER
+-N DOCKER-ISOLATION-STAGE-1
+-N DOCKER-ISOLATION-STAGE-2
+-N DOCKER-USER
+-A INPUT -j CLOUDRON_RATELIMIT
+-A INPUT -j CLOUDRON
+-A FORWARD -j DOCKER-USER
+-A FORWARD -j DOCKER-ISOLATION-STAGE-1
+-A FORWARD -o br-a8c952748d20 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -o br-a8c952748d20 -j DOCKER
+-A FORWARD -i br-a8c952748d20 ! -o br-a8c952748d20 -j ACCEPT
+-A FORWARD -i br-a8c952748d20 -o br-a8c952748d20 -j ACCEPT
+-A FORWARD -j CLOUDRON_RATELIMIT
+-A FORWARD -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -o docker0 -j DOCKER
+-A FORWARD -i docker0 ! -o docker0 -j ACCEPT
+-A FORWARD -i docker0 -o docker0 -j ACCEPT
+-A CLOUDRON -m set --match-set cloudron_blocklist src -j DROP
+-A CLOUDRON -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A CLOUDRON -p tcp -m tcp -m multiport --dports 22,80,202,443 -j ACCEPT
+-A CLOUDRON -p tcp -m multiport --dports 3478,5349 -j ACCEPT
+-A CLOUDRON -p udp -m multiport --dports 3478,5349 -j ACCEPT
+-A CLOUDRON -p udp -m multiport --dports 50000:51000 -j ACCEPT
+-A CLOUDRON -p icmp -m icmp --icmp-type 8 -j ACCEPT
+-A CLOUDRON -p icmp -m icmp --icmp-type 0 -j ACCEPT
+-A CLOUDRON -p udp -m udp --sport 53 -j ACCEPT
+-A CLOUDRON -s 172.18.0.0/16 -j ACCEPT
+-A CLOUDRON -i lo -j ACCEPT
+-A CLOUDRON -m limit --limit 2/min -j LOG --log-prefix "Packet dropped: " --log-level 7
+-A CLOUDRON -j DROP
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 80 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 443 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --set --name public-22 --mask 255.255.255.255 --rsource 
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --update --seconds 10 --hitcount 5 --name public-22 --mask 255.255.255.255 --rsource -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 202 -m state --state NEW -m recent --set --name public-202 --mask 255.255.255.255 --rsource 
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 202 -m state --state NEW -m recent --update --seconds 10 --hitcount 5 --name public-202 --mask 255.255.255.255 --rsource -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 636 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -p tcp -m tcp --dport 3004 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT ! -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 2525 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 50 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT ! -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 4190 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 50 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT ! -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 9993 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 50 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 2525 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 500 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 3002 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 500 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 4190 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 500 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 9993 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 500 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 9995 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 500 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 3306 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 5432 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 6379 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT -s 172.18.0.0/16 -d 172.18.0.0/16 -p tcp -m tcp --dport 27017 --tcp-flags FIN,SYN,RST,ACK SYN -m connlimit --connlimit-above 5000 --connlimit-mask 32 --connlimit-saddr -j CLOUDRON_RATELIMIT_LOG
+-A CLOUDRON_RATELIMIT_LOG -m limit --limit 2/min -j LOG --log-prefix "IPTables RateLimit: " --log-level 7
+-A CLOUDRON_RATELIMIT_LOG -j DROP
+-A DOCKER -d 172.18.0.7/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 22 -j ACCEPT
+-A DOCKER -d 172.18.0.2/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 4190 -j ACCEPT
+-A DOCKER -d 172.18.0.2/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 9995 -j ACCEPT
+-A DOCKER -d 172.18.0.2/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 9993 -j ACCEPT
+-A DOCKER -d 172.18.0.2/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 2587 -j ACCEPT
+-A DOCKER -d 172.18.0.2/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 2465 -j ACCEPT
+-A DOCKER -d 172.18.0.6/32 ! -i br-a8c952748d20 -o br-a8c952748d20 -p tcp -m tcp --dport 2003 -j ACCEPT
+-A DOCKER-ISOLATION-STAGE-1 -i br-a8c952748d20 ! -o br-a8c952748d20 -j DOCKER-ISOLATION-STAGE-2
+-A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
+-A DOCKER-ISOLATION-STAGE-1 -j RETURN
+-A DOCKER-ISOLATION-STAGE-2 -o br-a8c952748d20 -j DROP
+-A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
+-A DOCKER-ISOLATION-STAGE-2 -j RETURN
+-A DOCKER-USER -m set --match-set cloudron_blocklist src -j DROP
+-A DOCKER-USER -j RETURN
