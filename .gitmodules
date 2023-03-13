@@ -61,3 +61,9 @@
 [submodule "app_installs/ytdl-sub"]
 	path = app_installs/ytdl-sub
 	url = https://github.com/jmbannon/ytdl-sub
+[submodule "/home/pc/Public/server/cheatsheets/code-snippets"]
+	path = /home/pc/Public/server/cheatsheets/code-snippets
+	url = https://github.com/complexorganizations/code-snippets
+[submodule "cheatsheets/codesnippets_complexOrgs"]
+	path = cheatsheets/codesnippets_complexOrgs
+	url = https://github.com/complexorganizations/code-snippets
