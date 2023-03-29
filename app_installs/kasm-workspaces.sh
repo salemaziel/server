@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Sloppy af but it works
-BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )
-"
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )"
+
 # something else to try:
 #SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
@@ -74,11 +74,68 @@ fi
 }
 
 
+function choose_port() {
+read -p "Use default port 443? [y/n] " "use_default_port"
+
+case $use_default_port in
+	Y|y|yes)
+		echo -e "Starting install"
+		;;
+	N|n|no)
+		echo -e "\nEnter the port to use instead: "
+		read port_choice
+		if [[ "$port_choice" =~ ^[0-9]+$ ]]; then
+			export port_choice
+		else
+			echo -e "port choice must be valid port number"
+			echo -e "\nEnter the port to use instead: "
+                	read port_choice
+                		if [[ "$port_choice" =~ ^[0-9]+$ ]]; then
+                        		export port_choice
+				else
+					echo -e "invalid choice. quitting"
+					sleep 1
+					exit 1
+				fi
+		fi
+		;;
+	*)
+		echo -e "invalid. quitting"
+		exit 1
+		;;
+esac
+}
+
+source $BASE_DIR/scripts/create-swap.sh
+
+
 # Installing Kasm Workspace
 cd /tmp || exit
 
-curl -O https://kasm-static-content.s3.amazonaws.com/kasm_release_1.11.0.18142e.tar.gz
+echo -e "Downloading kasm tarball"
+#curl -O https://kasm-static-content.s3.amazonaws.com/kasm_release_1.11.0.18142e.tar.gz
+curl -O https://kasm-static-content.s3.amazonaws.com/kasm_release_1.12.0.d4fd8a.tar.gz
 
+echo -e "unpacking tar ball"
 tar -xf kasm_release*.tar.gz
 
-sudo bash kasm_release/install.sh
+echo -e "Moving tarball to $USER home, to save from needing to re-download again if error occurs"
+mv kasm_release*.tar.gz ~/
+
+
+
+choose_port
+
+if [[ -z $port_choice ]]; then
+	echo -e "Using default port 443"
+	sleep 1
+	sudo bash -x kasm_release/install.sh
+elif [[ "$port_choice" =~ ^[0-9]+$ ]];
+	echo -e " Installing. Configured to use port $port_choice"
+	sleep 2
+	sudo bash -x kasm_release/install.sh -L "$port_choice"
+else
+	echo -e "Some kind off error occured. Quitting"
+	sleep 1
+	exit 2
+fi
