@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Sloppy af but it works
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )"
@@ -6,13 +6,14 @@ BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )"
 # something else to try:
 #SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
-echo $BASE_DIR
+echo "$BASE_DIR"
 
-exit 0
+ls "$BASE_DIR"/
 
 
-source $BASE_DIR/common/text-styling.sh
-source $BASE_DIR/common/sys-checks.sh
+
+source "$BASE_DIR"/common/text-styling.sh
+source "$BASE_DIR"/common/sys-checks
 
 # Check if user is root
 super-user-check
@@ -29,19 +30,19 @@ function check-compatible(){
         elif [ "${DISTRO}" == "rhel" ] ; then
             echo_warn "Extra scripts are needed to install on RHEL"
             echo_prompt "Do you want to continue? [y/n]"
-            until [[ $CONTINUE =~ (y|n) ]]; do
+            until [[ "$CONTINUE" =~ (y|n) ]]; do
                 read -rp "Continue? [y/n]: " -e CONTINUE
             done
-            if [[ $CONTINUE == "n" ]]; then
+            if [[ "$CONTINUE" == "n" ]]; then
                 exit 1
-            elif [[ $CONTINUE == "y" ]]; then
+            elif [[ "$CONTINUE" == "y" ]]; then
                 echo_note "Ok, running scripts"
                 sleep 1
                 install-kasm-rhel
             fi
         else
             echo "Error: ${DISTRO} is not supported."
-            exit 1 
+            exit 1
         fi
 }
 
@@ -106,7 +107,7 @@ case $use_default_port in
 esac
 }
 
-source $BASE_DIR/scripts/create-swap.sh
+source "$BASE_DIR"/scripts/create-swap.sh
 
 
 # Installing Kasm Workspace
@@ -130,7 +131,7 @@ if [[ -z $port_choice ]]; then
 	echo -e "Using default port 443"
 	sleep 1
 	sudo bash -x kasm_release/install.sh
-elif [[ "$port_choice" =~ ^[0-9]+$ ]];
+elif [[ "$port_choice" =~ ^[0-9]+$ ]]; then
 	echo -e " Installing. Configured to use port $port_choice"
 	sleep 2
 	sudo bash -x kasm_release/install.sh -L "$port_choice"
