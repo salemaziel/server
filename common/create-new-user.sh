@@ -54,6 +54,47 @@ case $create_user in
 esac
 }
 
+function create-sudo-user-ai_cursor() {
+    read -p "Create a new regular user with sudo privileges? [y/n] " create_user
+    case $create_user in
+        Y|y)
+            read -p "Enter username: " new_user
+            if getent passwd "$new_user" > /dev/null 2>&1; then
+                echo "User $new_user already exists!"
+                read -p "Change password for $new_user? [y/n] " change_passwd
+                case $change_passwd in
+                    y)
+                        echo "Ok, let's update that password"
+                        echo "Must be 8+ characters with mix of letters, digits, & symbols"
+                        read -s new_passwd2
+                        sudo echo -e "$new_passwd2\n$new_passwd2" | passwd $new_user > /dev/null 2>&1
+                        echo "Password for $new_user successfully changed"
+                        ;;
+                    n)
+                        echo "Ok, continuing"
+                        ;;
+                esac
+            else
+                echo "Must be 8+ characters with mix of letters, digits, & symbols"
+                read -s new_passwd
+                add_usersudo "$new_passwd"
+            fi
+            ;;
+        N|n)
+            echo "Fsho."
+            ;;
+        *)
+            echo "Bruh."
+            echo "You only had TWO options."
+            echo "Terrible. Take a lap."
+            exit 1
+            ;;
+    esac
+}
+
+
+
+
 
 add_usersudo() {
     echo_note " *** Creating new user with sudo privileges *** "
@@ -70,3 +111,16 @@ add_usersudo() {
     sleep 2
 }
 
+function add_usersudo-ai_cursor() {
+    echo " *** Creating new user with sudo privileges *** "
+    useradd -m -s /bin/bash -U "$new_user"
+    usermod -aG sudo "$new_user"
+    sudo echo -e "$1\n$1" | passwd "$new_user" > /dev/null 2>&1
+    if [[ -f $HOME/.ssh/authorized_keys ]]; then
+        echo "Copying SSH authorized_keys file to new user"
+        mkdir -p /home/"$new_user"/.ssh
+        cp $HOME/.ssh/authorized_keys /home/"$new_user"/.ssh/
+        chown -R "$new_user":"$new_user" /home/"$new_user"/.ssh
+    fi
+    echo "New user $new_user successfully created with sudo privileges"
+}

@@ -35,8 +35,8 @@ BG_DEFAULT="$(tput setab 9)"
 
 
 
-echo "${BOLD}HEADING${RESET}"
+echo "${TEXT_BOLD}${TEXT_GREEN}HEADING${RESET}"
 
 
-echo "It's ${BOLD}${COL_RED}red${COL_NORM}${RESET} ${BOLD}and ${COL_GREEN}kinda${RESET} green${COL_NORM} - have you seen?"
+echo "It's ${TEXT_BOLD}${TEXT_RED}red${TEXT_RESET} ${TEXT_BOLD}and ${TEXT_GREEN}kinda${RESET} green${TEXT_RESET} - have you seen?"
 

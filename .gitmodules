@@ -67,3 +67,6 @@
 [submodule "cheatsheets/codesnippets_complexOrgs"]
 	path = cheatsheets/codesnippets_complexOrgs
 	url = https://github.com/complexorganizations/code-snippets
+[submodule "/home/pc/Public/server/net_service_installs/wireguard-over-wss"]
+	path = /home/pc/Public/server/net_service_installs/wireguard-over-wss
+	url = https://github.com/jnsgruk/wireguard-over-wss
