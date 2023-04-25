@@ -70,3 +70,15 @@
 [submodule "/home/pc/Public/server/net_service_installs/wireguard-over-wss"]
 	path = /home/pc/Public/server/net_service_installs/wireguard-over-wss
 	url = https://github.com/jnsgruk/wireguard-over-wss
+[submodule "/home/pc/Public/server/cheatsheets/awesome-console-services"]
+	path = /home/pc/Public/server/cheatsheets/awesome-console-services
+	url = https://github.com/chubin/awesome-console-services
+[submodule "/home/pc/Public/server/scripts/awesome-discoveries"]
+	path = /home/pc/Public/server/scripts/awesome-discoveries
+	url = https://github.com/whitone/awesome-discoveries
+[submodule "/home/pc/Public/server/cheatsheets/the-art-of-command-line"]
+	path = /home/pc/Public/server/cheatsheets/the-art-of-command-line
+	url = https://github.com/jlevy/the-art-of-command-line
+[submodule "/home/pc/Public/server/cheatsheets/python-cheatsheet"]
+	path = /home/pc/Public/server/cheatsheets/python-cheatsheet
+	url = https://github.com/gto76/python-cheatsheet
