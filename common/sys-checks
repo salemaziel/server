@@ -1,4 +1,3 @@
-#!/bin/bash
 # -Super User Check
 # -Distro check
 # -System requirements pre-check
@@ -319,7 +318,7 @@ function sys-check() {
 	dist-check
 
 	# Check for kernel version
-  	kernel-check
+	kernel-check
 	
 	# Check for architecture
 	arch-check

@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-# Variables
+# Variables - Set base directory
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 declare -r -x SCRIPT_DIR
 
@@ -10,12 +10,29 @@ declare -r -x SCRIPT_DIR
 # shellcheck source=common/text-styling2023
 source "$SCRIPT_DIR"/common/styling
 
-# Set base directory
-
-
-
 # Syschecks
 source "$SCRIPT_DIR/common/sys-checks"
+
+## Display Welcome to Post Installer
+echo_note '
+    ____                  __       
+   / __ \  ___    ____   / /_      
+  / /_/ / / __ \ / ___/ / __/ ______
+ / ____/ / /_/ /(__   )/ /_  /_____/
+/_/      \____/ /____/ \__/        
+                                 '
+                                                                                           
+echo_note '
+    ____              __           __ __           
+   /  _/____   _____ / /_  ____ _ / // /___   _____
+   / / / __ \ / ___// __/ / __ `// // // _ \ / ___/
+ _/ / / / / / \__  )/ /_ / /_/ // // //  __// /    
+/___//_/ /_/ /____/ \__/ \__,_//_//_/ \___//_/  
+
+'
+
+sleep 1
+
 
 # check if root or using sudo
 super-user-check
@@ -27,15 +44,12 @@ source "$SCRIPT_DIR/common/create-new-user.func"
 # Choice to add new user with sudo privs
 create-sudo-user
 
-# Add functions
-#source "$SCRIPT_DIR"/common/functions.sh
-
-
-
 # Make executable, install configs
 chmod +x "$SCRIPT_DIR"/confs/install-confs.sh
 "$SCRIPT_DIR"/confs/install-confs.sh
 
+# Add functions
+source "$SCRIPT_DIR"/common/functions.func
 
 
 # Choice to Install Docker and Docker-Compose
