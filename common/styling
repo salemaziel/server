@@ -144,25 +144,25 @@ declare -r -x RST=$'\033[0m'
 declare -r -x RESET=$'\033[0m'
 
 ## Foreground/Text Colors
-declare -r -x TEXT_BLACK=$(tput setaf 0)
-declare -r -x TEXT_RED="$(tput setaf 1)"
-declare -r -x TEXT_GREEN="$(tput setaf 2)"
-declare -r -x TEXT_YELLOW="$(tput setaf 3)"
-declare -r -x TEXT_BLUE="$(tput setaf 4)"
-declare -r -x TEXT_MAGENTA="$(tput setaf 5)"
-declare -r -x TEXT_CYAN="$(tput setaf 6)"
-declare -r -x TEXT_WHITE="$(tput setaf 7)"
+declare -r -x TEXT_TBLACK=$(tput setaf 0)
+declare -r -x TEXT_TRED="$(tput setaf 1)"
+declare -r -x TEXT_TGREEN="$(tput setaf 2)"
+declare -r -x TEXT_TYELLOW="$(tput setaf 3)"
+declare -r -x TEXT_TBLUE="$(tput setaf 4)"
+declare -r -x TEXT_TMAGENTA="$(tput setaf 5)"
+declare -r -x TEXT_TCYAN="$(tput setaf 6)"
+declare -r -x TEXT_TWHITE="$(tput setaf 7)"
 
 declare -r -x TEXT_DEFAULT_COLOR="$(tput setaf 9)"
 
 # Text Styles
-declare -r -x TEXT_BOLD=$(tput bold)
-declare -r -x TEXT_DIM=$(tput dim)
-declare -r -x TEXT_STANDOUT=$(tput smso)
-declare -r -x TEXT_UNDERLINE=$(tput smul)
-declare -r -x TEXT_BLINK=$(tput blink)
-declare -r -x TEXT_REVERSE=$(tput rev)
-declare -r -x TEXT_RESET=$(tput sgr0)
+declare -r -x TEXT_TBOLD=$(tput bold)
+declare -r -x TEXT_TDIM=$(tput dim)
+declare -r -x TEXT_TSTANDOUT=$(tput smso)
+declare -r -x TEXT_TUNDERLINE=$(tput smul)
+declare -r -x TEXT_TBLINK=$(tput blink)
+declare -r -x TEXT_TREVERSE=$(tput rev)
+declare -r -x TEXT_TRESET=$(tput sgr0)
 
 
 # Background Colors
@@ -184,8 +184,8 @@ declare -r -x COL_RESET=$ESC_SEQ"39;49;00m"
 
 declare -r -x TEXT_NORMAL=$ESC_SEQ"0m"
 
-declare -r -x TEXT_BLINK=$ESC_SEQ"5m"
-declare -r -x TEXT_BLINK_RESET=$ESC_SEQ"25m"
+declare -r -x TEXT_BLINKING=$ESC_SEQ"5m"
+declare -r -x TEXT_BLINKING_RESET=$ESC_SEQ"25m"
 
 declare -r -x TEXT_HIDDEN=$ESC_SEQ"8m"
 declare -r -x TEXT_HIDDEN_RESET=$ESC_SEQ"28m"
