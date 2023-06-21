@@ -1,4 +1,6 @@
 
-*.history
+*.history/
 /.history/*
+
+.lh/
 
