@@ -7,7 +7,8 @@
 sudo apt-get install fonts-cantarell, ttf-ubuntu-font-family, git
 srcdir="/tmp/google-fonts"
 pkgdir="/usr/share/fonts/truetype/google-fonts"
-giturl="git://github.com/google/fonts.git"
+#giturl="git://github.com/google/fonts.git"
+giturl="https://github.com/google/fonts.git"
 
 mkdir $srcdir
 cd $srcdir

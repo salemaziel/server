@@ -4,12 +4,14 @@ set -eu -x
 
 
 TAILS_VERSION=$(torsocks curl -s https://mirrors.edge.kernel.org/tails/stable/ | grep "tails-amd" | cut -d \> -f 2 | cut -d \/ -f 1)
+#TAILS_VERSION=$(torsocks curl https://tails.net/install/v2/Tails/amd64/stable/latest.json)
+
 USE_TORSOCKS=""
 
 torsocks_check() {
 #if [ -z $(command -v torsocks) ] || [ $USE_TORSOCKS == "0" ]; then
-if [ -z $(command -v torsocks) ]; then
-	echo -e "Torsocks isn't installed. Ok to check for Tails version over clearweb?"
+if [ -z "$(command -v torsocks)" ]; then
+	echo -e "Torsocks isn't installed. Ok to check for Tails version over clearweb? [y/n] "
 	echo -e "You can ignore this if using a vpn"
 	read curl_clearweb
 	case $curl_clearweb in
@@ -35,16 +37,21 @@ if [ -z $(command -v torsocks) ]; then
 fi
 }
 
-get_key() {
-## Import the Tails signing key in your GnuPG keyring:
-torsocks wget https://tails.boum.org/tails-signing.key
-gpg --import < tails-signing.key
 
 # to test:  wget https://tails.boum.org/tails-signing.key | gpg --import -  (?? would this work?? test it)
+get_key() {
+    ## Import the Tails signing key in your GnuPG keyring:
+    torsocks wget https://tails.boum.org/tails-signing.key
+    gpg --import < tails-signing.key
 
-## Install the Debian keyring. It contains the OpenPGP keys of all Debian developers
-sudo apt update && sudo apt install debian-keyring -y
+    if ! dpkg -s debian-keyring >/dev/null 2>&1; then
+        ## Install the Debian keyring. It contains the OpenPGP keys of all Debian developers
+        dpkg -s debian-keyring || sudo apt update && sudo apt install debian-keyring -y
+    else
+        echo -e "debian-keyring already installed"
+    fi
 }
+
 
 import_key() {
 ## Import the OpenPGP key of Chris Lamb, a former Debian Project Leader, from the Debian keyring into your keyring
@@ -56,7 +63,7 @@ gpg --keyid-format 0xlong --check-sigs A490D0F4D311A4153E2BB7CADBB802B258ACD84F 
 ## sig!         0x1E953E27D4311E58 2020-03-19  Chris Lamb <chris@chris-lamb.co.uk>
 
 sleep 3
-echo "\nThe line 175 signatures not checked due to missing keys or similar refers to the certifications (also called signatures) made by other public keys that are not in your keyring. This is not a problem."
+echo -e "\nThe line 175 signatures not checked due to missing keys or similar refers to the certifications (also called signatures) made by other public keys that are not in your keyring. This is not a problem."
 
 ## Certify the Tails signing key with your own key:
 # gpg --lsign-key A490D0F4D311A4153E2BB7CADBB802B258ACD84F
@@ -66,18 +73,18 @@ echo "\nThe line 175 signatures not checked due to missing keys or similar refer
 get_tails() {
 ## download tails usb image (dec 30, 2021)
 
-wget --continue "https://download.tails.net/tails/stable/${TAILS_VERSION}/${TAILS_VERSION}.img"
-
-export TA
+#torsocks wget --continue "https://download.tails.net/tails/stable/${TAILS_VERSION}/${TAILS_VERSION}.img"
+torsocks wget --continue "https://mirrors.wikimedia.org/tails/stable/${TAILS_VERSION}/${TAILS_VERSION}.img"
+#export TA
 
 }
 
 verify_sig() {
 ## download tails sig
-wget https://tails.boum.org/torrents/files/${TAILS_VERSION}.img.sig
+torsocks wget https://tails.boum.org/torrents/files/"${TAILS_VERSION}".img.sig
 
 ## Verify that the USB image is signed by the Tails signing key:
-TZ=UTC gpg --no-options --keyid-format long --verify ${TAILS_VERSION}.img.sig ${TAILS_VERSION}.img
+TZ=UTC gpg --no-options --keyid-format long --verify "${TAILS_VERSION}.img.sig" "${TAILS_VERSION}.img"
 
 sleep 3
 echo -e " The output of previous command should be the following:"
@@ -111,7 +118,7 @@ case "$install_tails" in
           sleep 2
           echo -e "checking available disks..."
           sleep 2
-          lsblk -a
+          lsblk -d -o name --noheadings
           sleep 2
           read -p "Enter your usb disks name (e.g. sda, sdb, etc):  "  "usb_disk"
           echo -e "You selected: /dev/$usb_disk"
@@ -161,7 +168,7 @@ dl_gpgkey_prompt() {
 	echo -e "Can skip this if already imported"
 	echo -e "If in doubt, answer yes"
 	read dl_key
-	case dl_key in
+	case $dl_key in
 		Y|y)
 			get_key
 			import_key

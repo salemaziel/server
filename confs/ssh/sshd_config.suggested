@@ -14,6 +14,11 @@
 ## The pgrep -f "sshd -D" part will return only the PID of the 
 ## sshd daemon process that listens for new connections
 
+Protocol 2
+
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
 
 Port 22
 PermitRootLogin no
@@ -32,11 +37,13 @@ ChallengeResponseAuthentication no
 # and ChallengeResponseAuthentication to no.
 UsePAM no
 
+GSSAPIAuthentication no
+KerberosAuthentication no
+
 AuthenticationMethods publickey
 PubkeyAuthentication yes
 
-## Expect .ssh/authorized_keys2 to be disregarded by default in future.
-AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+AuthorizedKeysFile	.ssh/authorized_keys
 
 # Checks at 30 second intervals, if fails 120 times it disconnects
 # Good or an hour of network disruption
@@ -47,6 +54,18 @@ X11Forwarding no
 AllowAgentForwarding no
 AllowTcpForwarding no
 
+
+AllowAgentForwarding no
+AllowStreamLocalForwarding no
+GatewayPorts no   
+#DisableForwarding yes
+#PermitTunnel no
+
+
+IgnoreRhosts yes
+IgnoreUserKnownHosts yes
+HostbasedAuthentication no
+
 MaxAuthTries 5
 MaxSessions 2
 TCPKeepAlive no
@@ -54,23 +73,29 @@ Compression no
 
 ## Allow client to pass locale environment variables
 AcceptEnv LANG LC_*
+#PermitUserEnvironment no
 
 ## override default of no subsystems
-Subsystem	sftp	/usr/lib/openssh/sftp-server
+#Subsystem	sftp	/usr/lib/openssh/sftp-server
+Subsystem sftp  /usr/lib/openssh/sftp-server -f AUTHPRIV -l INFO
+
+UseDNS no
+
+PermitTTY yes
 
 
-## Add your users or groups here
-## Ex. 
-#AllowUsers john sarah erik
-#AllowGroups group1 staff mybackups
-
-#AllowUsers
-#AllowGroups
+#AllowUsers user1 user2
+#AllowGroups group1 group2
 
 ## Logging
-#SyslogFacility AUTH
+SyslogFacility AUTH
 LogLevel VERBOSE
+PrintLastLog yes
 
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#ChrootDirectory none
+#VersionAddendum none
 
 
 ## To receive emails** upon ssh logins getting root access,
@@ -83,7 +108,7 @@ LogLevel VERBOSE
 
 
 
-#### UNUSED OR DEFAULTS FROM SYSTEM  ###
+#### OTHER OPTIONS  ###
 
 #AuthorizedKeysCommand none
 #AuthorizedKeysCommandUser nobody

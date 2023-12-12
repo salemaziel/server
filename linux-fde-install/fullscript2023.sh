@@ -32,10 +32,13 @@ wipe_disk() {
   local DEVICE=/dev/mapper/to_be_wiped
 
   if [[ "${wipe_method}" == "slow" ]]; then
-    dd if=/dev/zero obs=64K ibs=4K of="${DEVICE}" oflag=direct status=progress
+    nohup dd if=/dev/zero obs=64K ibs=4K of="${DEVICE}" oflag=direct status=progress &
   else
     local PASS=$(tr -cd '[:alnum:]' </dev/urandom | head -c128)
-    openssl enc -aes-256-ctr -pbkdf2 -pass pass:"$PASS" -nosalt </dev/zero | dd obs=64K ibs=4K of="${DEVICE}" oflag=direct status=progress
+    
+    nohup $SHELL <<EOF &
+openssl enc -aes-256-ctr -pbkdf2 -pass pass:"$PASS" -nosalt </dev/zero | dd obs=64K ibs=4K of="${DEVICE}" oflag=direct status=progress
+EOF
   fi
 
   cryptsetup close to_be_wiped

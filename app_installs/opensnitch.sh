@@ -23,10 +23,11 @@ if [ "$CURRENT_OPENSNITCH_VERSION" == "$LATEST_RELEASE" ]; then
   exit 0
 else
 
-    DOWNLOAD_URL_DAEMON=$(curl -s https://api.github.com/repos/"$REPO_OWNER"/"$REPO_NAME"/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | head -1 | awk '{sub(/^[ \t]+/, "")};1' )
+	#DOWNLOAD_URL_DAEMON=$(curl -s https://api.github.com/repos/"$REPO_OWNER"/"$REPO_NAME"/releases/latest | grep "browser_download_url.*amd64.deb" | cut -d : -f 2,3 | tr -d \" | head -1 | awk '{sub(/^[ \t]+/, "")};1' )
+	DOWNLOAD_URL_DAEMON=$(curl -s https://api.github.com/repos/"$REPO_OWNER"/"$REPO_NAME"/releases | grep "browser_download_url.*amd64.deb" | grep -v "python3-opensnitch-ui" | grep -v '\-rc\/' | cut -d : -f 2,3 | tr -d \" | head -1 | awk '{sub(/^[ \t]+/, "")};1')
 
-    DOWNLOAD_URL_UI=$(curl -s https://api.github.com/repos/"$REPO_OWNER"/"$REPO_NAME"/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | tail -1 | sed 's/.PIP//' | awk '{sub(/^[ \t]+/, "")};1' )
-
+	#DOWNLOAD_URL_UI=$(curl -s https://api.github.com/repos/"$REPO_OWNER"/"$REPO_NAME"/releases | grep "browser_download_url.*deb" | grep "python3-opensnitch-ui" | grep -v -e '\-rc\/' | cut -d : -f 2,3 | tr -d \" | head -1 | sed 's/.PIP//' | awk '{sub(/^[ \t]+/, "")};1' )
+	DOWNLOAD_URL_UI=$(curl -s https://api.github.com/repos/"$REPO_OWNER"/"$REPO_NAME"/releases | grep "browser_download_url.*deb" | grep "python3-opensnitch-ui" | grep -v -e '\-rc\/' | cut -d : -f 2,3 | tr -d \" | head -1 | awk '{sub(/^[\t]+/, "")};1')
 
     cd "$DOWNLOAD_FOLDER" || return
 
