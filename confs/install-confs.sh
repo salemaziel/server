@@ -36,7 +36,7 @@ echo_debug() { echo -e "${ANSI_VIO}${@}${ANSI_RST}"; }
 echo_fail() { echo -e "${ANSI_RED}${@}${ANSI_RST}"; }
 
 # shellcheck source=./confs/install-conf.func
-source ./confs/install-confs.func
+source ./confs/install-conf-func
 
 ## Require script to be run as root
 super-user-check

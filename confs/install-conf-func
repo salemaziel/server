@@ -44,7 +44,7 @@ function installing-system-requirements() {
       echo_note "Hit Ctrl+c if you need to exit. May need to enter it a few times"
       sleep 2
       ;;
-    N|)
+    N|n)
       echo_note "Fsho, Quitting. Maybe just try running parts of this script to get what you need"
       sleep 4
       exit 0
