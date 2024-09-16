@@ -47,7 +47,7 @@ BOOKMARK_FILE_NAME="${BOOKMARK_FILE/%.html/}"
 #BOOKMARK_FILE_TEXT=$(cat "$BOOKMARK_FILE")
 #BOOKMARK_FILE_TEXT_LINE=$(printf '%s\n' "$line")
 
-STRING_START='chrome-extension'
+STRING_START='chrome-extension://'
 STRING_END='&uri='
 NEW_STRING_END=''
 
